@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT.04 - Carga de Instructivo</title>
+  <style>
+    :root { --rojo-marca: rgb(163, 0, 0); --rojo-oscuro: rgb(125, 0, 0); --gris-fondo: rgb(195, 197, 202); --gris-oscuro: rgb(67, 63, 64); --texto-negro: rgb(26, 26, 26); --blanco: #ffffff; }
+    body { font-family: Arial, sans-serif; background-color: var(--gris-fondo); margin: 0; padding: 15px; color: var(--texto-negro); }
+    .formulario-contenedor { background-color: var(--blanco); border-radius: 8px; max-width: 1000px; margin: 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.2); overflow: hidden; }
+    .encabezado { background-color: var(--blanco); padding: 15px 20px; border-bottom: 3px solid var(--rojo-marca); }
+    
+    .cabecera-titular { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    h1 { margin: 0; color: var(--rojo-marca); font-size: 24px; text-align: center; flex-grow: 1; }
+    .btn-volver-menu { background-color: var(--gris-oscuro); color: white; text-decoration: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; font-size: 14px; }
+    
+    .fila-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    .fila-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .contenedor-tabs { display: flex; background-color: rgb(230, 230, 230); border-bottom: 2px solid var(--gris-oscuro); }
+    .btn-tab { flex: 1; padding: 15px; font-size: 18px; font-weight: bold; background: none; border: none; cursor: pointer; color: var(--gris-oscuro); transition: 0.3s; }
+    .btn-tab.activo { background-color: var(--blanco); color: var(--rojo-marca); border-bottom: 4px solid var(--rojo-marca); }
+    .contenido-tab { display: none; padding: 20px; animation: aparecer 0.3s ease-in; }
+    .contenido-tab.activo { display: block; }
+    @keyframes aparecer { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .campo { display: flex; flex-direction: column; margin-bottom: 15px; }
+    label { font-weight: bold; margin-bottom: 8px; font-size: 16px; color: var(--texto-negro); }
+    h3 { color: var(--rojo-marca); font-size: 18px; margin-top: 30px; margin-bottom: 10px; border-bottom: 1px solid rgb(179,179,179); padding-bottom: 5px; }
+    input[type="number"], input[type="text"], input[type="date"], select, input[type="file"] { padding: 12px; font-size: 18px; border: 1px solid rgb(135,135,135); border-radius: 4px; }
+    input[readonly] { background-color: rgb(240,240,240); color: var(--gris-oscuro); border: 1px dashed rgb(179,179,179); font-weight: bold; text-align: center; }
+    input:focus, select:focus, textarea:focus { outline: 2px solid var(--rojo-marca); } 
+    textarea { width: 100%; padding: 12px; font-size: 18px; border: 1px solid rgb(135,135,135); border-radius: 4px; box-sizing: border-box; resize: vertical; min-height: 100px; font-family: Arial, sans-serif; }
+    .tabla-datos { width: 100%; border-collapse: collapse; margin-top: 5px; }
+    .tabla-datos th, .tabla-datos td { border: 1px solid rgb(179,179,179); padding: 8px; text-align: left; }
+    .tabla-datos th { background-color: var(--gris-oscuro); color: var(--blanco); font-size: 16px; }
+    .tabla-datos input, .tabla-datos select { width: 100%; box-sizing: border-box; padding: 8px; font-size: 16px; }
+    .btn-agregar-fila { background-color: #4CAF50; color: white; border: none; padding: 10px 15px; font-size: 16px; border-radius: 4px; cursor: pointer; margin-top: 10px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+    .btn-agregar-fila:hover { background-color: #45a049; }
+    .btn-eliminar-fila { background-color: var(--rojo-marca); color: white; border: none; padding: 8px 12px; font-size: 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .btn-guardar { background-color: var(--rojo-marca); color: var(--blanco); border: none; padding: 20px; width: 100%; font-size: 22px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 20px; }
+    .btn-guardar:hover { background-color: var(--rojo-oscuro); }
+    .btn-guardar:disabled { background-color: var(--gris-oscuro); cursor: wait; }
+
+    /* Estilos para el contenedor de la foto */
+    .foto-preview-container { position: relative; max-width: 600px; margin: 15px auto 0 auto; display: none; border: 2px dashed rgb(135,135,135); padding: 10px; border-radius: 4px; background-color: rgb(245,245,245); }
+    .foto-preview-img { width: 100%; height: auto; border-radius: 4px; object-fit: contain; display: block; }
+    .btn-eliminar-foto { position: absolute; top: 15px; right: 15px; background-color: var(--rojo-marca); color: white; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.4); }
+    .btn-eliminar-foto:hover { background-color: var(--rojo-oscuro); transform: scale(1.1); }
+  </style>
+</head>
+<body>
+
+  <div class="formulario-contenedor">
+    <div class="encabezado">
+      <div class="cabecera-titular">
+        <a href="index.html" class="btn-volver-menu">← Menú Principal</a>
+        <h1 id="tituloPrincipal">Instructivo Puesta a Punto - Celda Soldadura</h1>
+        <div style="width: 120px;"></div> <!-- Nivelador visual -->
+      </div>
+      <div class="fila-grid-3">
+        <div class="campo"><label>1. N° Máquina:</label><input type="text" id="campoMaquina" readonly value="Cargando..."></div>
+        <div class="campo"><label>2. Fecha:</label><input type="date" id="fechaActual"></div>
+        <div class="campo"><label>Revisión actual:</label><input type="text" id="campoRevision" readonly value="Rev. 00" data-rev="0"></div>
+      </div>
+    </div>
+
+    <div class="contenedor-tabs">
+      <button class="btn-tab activo" onclick="cambiarTab(event, 'tab-general')">Datos Generales</button>
+      <button class="btn-tab" onclick="cambiarTab(event, 'tab-e1')">Estación 1</button>
+      <button class="btn-tab" onclick="cambiarTab(event, 'tab-e2')">Estación 2</button>
+    </div>
+
+    <div id="tab-general" class="contenido-tab activo">
+      <div class="fila-grid">
+        <div class="campo"><label>3. Código Conjunto Tubo:</label><input type="number" id="codigoTubo" placeholder="Ej: 400003"></div>
+        <div class="campo"><label>4. Descripción Conjunto Tubo:</label><input type="text" id="descTubo" readonly placeholder="Cargando..."></div>
+      </div>
+      <div class="fila-grid">
+        <div class="campo"><label>5. Código Conjunto Vástago:</label><input type="number" id="codigoVastago" placeholder="Ej: 400001"></div>
+        <div class="campo"><label>6. Descripción Conjunto Vástago:</label><input type="text" id="descVastago" readonly placeholder="Cargando..."></div>
+      </div>
+    </div>
+
+    <div id="tab-e1" class="contenido-tab">
+      <div class="campo"><label>7. Programa E1:</label><input type="text" id="progE1" placeholder="prog_000_e1"></div>
+      
+      <div class="campo" style="margin-top: 15px;">
+        <label>9. Foto E1:</label>
+        <input type="file" id="inputFotoE1" accept="image/*" onchange="procesarFoto(event, 'E1')">
+        <div id="previewContainerE1" class="foto-preview-container">
+          <img id="previewImgE1" class="foto-preview-img" src="">
+          <button type="button" class="btn-eliminar-foto" onclick="eliminarFoto('E1')">X</button>
+        </div>
+      </div>
+      
+      <h3>Dispositivos Estación 1 (Máx 20)</h3>
+      <div style="overflow-x: auto;">
+        <table class="tabla-datos">
+          <thead><tr><th style="width: 10%;">Cant.</th><th style="width: 15%;">Código</th><th style="width: 15%;">Ub.</th><th style="width: 40%;">Descripción</th><th style="width: 15%;">Dist.</th><th style="width: 5%;"></th></tr></thead>
+          <tbody id="cuerpo-disp-e1">
+            <tr><td><input type="number"></td><td><input type="number" oninput="buscarDispositivo(this)"></td><td><input type="text" class="ub-dispositivo" readonly placeholder="..."></td><td><input type="text" class="desc-dispositivo" readonly placeholder="Esperando código..."></td><td><input type="text"></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <button class="btn-agregar-fila" onclick="agregarFilaDispositivo('cuerpo-disp-e1')">+ Agregar Dispositivo</button>
+
+      <h3>Secuencia de Clampeo E1 (Máx 6)</h3>
+      <div style="overflow-x: auto;">
+        <table class="tabla-datos">
+          <thead><tr><th style="width: 10%;">Orden</th><th style="width: 50%;">Acción</th><th style="width: 20%;">Clampeo (Cód)</th><th style="width: 15%;">Salida (N°)</th><th style="width: 5%;"></th></tr></thead>
+          <tbody id="cuerpo-clamp-e1"></tbody>
+        </table>
+      </div>
+      <button class="btn-agregar-fila" onclick="agregarFilaClampeo('cuerpo-clamp-e1')">+ Agregar Secuencia</button>
+
+      <div class="campo" style="margin-top: 30px;"><label>Observaciones Estación 1:</label><textarea id="obsE1"></textarea></div>
+    </div>
+
+    <div id="tab-e2" class="contenido-tab">
+      <div class="campo"><label>8. Programa E2:</label><input type="text" id="progE2" placeholder="prog_000_e2"></div>
+      
+      <div class="campo" style="margin-top: 15px;">
+        <label>10. Foto E2:</label>
+        <input type="file" id="inputFotoE2" accept="image/*" onchange="procesarFoto(event, 'E2')">
+        <div id="previewContainerE2" class="foto-preview-container">
+          <img id="previewImgE2" class="foto-preview-img" src="">
+          <button type="button" class="btn-eliminar-foto" onclick="eliminarFoto('E2')">X</button>
+        </div>
+      </div>
+
+      <h3>Dispositivos Estación 2 (Máx 20)</h3>
+      <div style="overflow-x: auto;">
+        <table class="tabla-datos">
+          <thead><tr><th style="width: 10%;">Cant.</th><th style="width: 15%;">Código</th><th style="width: 15%;">Ub.</th><th style="width: 40%;">Descripción</th><th style="width: 15%;">Dist.</th><th style="width: 5%;"></th></tr></thead>
+          <tbody id="cuerpo-disp-e2">
+            <tr><td><input type="number"></td><td><input type="number" oninput="buscarDispositivo(this)"></td><td><input type="text" class="ub-dispositivo" readonly placeholder="..."></td><td><input type="text" class="desc-dispositivo" readonly placeholder="Esperando código..."></td><td><input type="text"></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <button class="btn-agregar-fila" onclick="agregarFilaDispositivo('cuerpo-disp-e2')">+ Agregar Dispositivo</button>
+
+      <h3>Secuencia de Clampeo E2 (Máx 6)</h3>
+      <div style="overflow-x: auto;">
+        <table class="tabla-datos">
+          <thead><tr><th style="width: 10%;">Orden</th><th style="width: 50%;">Acción</th><th style="width: 20%;">Clampeo (Cód)</th><th style="width: 15%;">Salida (N°)</th><th style="width: 5%;"></th></tr></thead>
+          <tbody id="cuerpo-clamp-e2"></tbody>
+        </table>
+      </div>
+      <button class="btn-agregar-fila" onclick="agregarFilaClampeo('cuerpo-clamp-e2')">+ Agregar Secuencia</button>
+
+      <div class="campo" style="margin-top: 30px;"><label>Observaciones Estación 2:</label><textarea id="obsE2"></textarea></div>
+    </div>
+
+    <button class="btn-guardar" id="btnGuardar">Guardar Instructivo Completado</button>
+  </div>
+
+  <script>
+    const URL_APLICACION_WEB = "https://script.google.com/macros/s/AKfycbwgX5Y0eKXWBx6mrUYAEl3RZyX5VrAHd_WloEENa7KSGzCP1EKDttrDBC3KPVU5mRDNIQ/exec"; 
+    
+    // --- LÓGICA DE DETECCIÓN DE MÁQUINA Y URL ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const maquinaRaw = urlParams.get('maquina') || "";
+    const idMaquina = maquinaRaw.includes("97") ? "97" : "65";
+
+    let bdProductos = {}; let bdDispositivos = {}; 
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      // 1. Sincronizar Máquina
+      const inputMaquina = document.getElementById('campoMaquina');
+      const tituloH1 = document.getElementById('tituloPrincipal');
+      
+      if (idMaquina === "97") {
+        inputMaquina.value = "97 (KUKA KR C4)";
+        tituloH1.innerText = "Instructivo Puesta a Punto - Celda 97";
+      } else {
+        inputMaquina.value = "65 (KUKA KR5)";
+        tituloH1.innerText = "Instructivo Puesta a Punto - Celda 65";
+      }
+
+      document.getElementById('fechaActual').valueAsDate = new Date();
+      
+      await cargarBaseDeDatos();
+      
+      activarAutocompletadoProductos('codigoTubo', 'descTubo'); 
+      activarAutocompletadoProductos('codigoVastago', 'descVastago');
+      agregarFilaClampeo('cuerpo-clamp-e1'); 
+      agregarFilaClampeo('cuerpo-clamp-e2');
+
+      // 2. Cargar datos si es Edición
+      if (urlParams.get('accion') === 'editar') {
+        await cargarDatosEdicion(urlParams.get('codigo'));
+      }
+    });
+
+    function cambiarTab(evento, idTab) {
+      const contenidos = document.getElementsByClassName("contenido-tab");
+      for (let i = 0; i < contenidos.length; i++) contenidos[i].classList.remove("activo");
+      const botones = document.getElementsByClassName("btn-tab");
+      for (let i = 0; i < botones.length; i++) botones[i].classList.remove("activo");
+      document.getElementById(idTab).classList.add("activo");
+      evento.currentTarget.classList.add("activo");
+    }
+
+    // Funciones de Agregar / Eliminar Filas
+    function agregarFilaDispositivo(idTablaCuerpo) {
+      const tbody = document.getElementById(idTablaCuerpo);
+      if (tbody.children.length >= 20) return;
+      const nuevaFila = document.createElement('tr');
+      nuevaFila.innerHTML = `<td><input type="number"></td><td><input type="number" oninput="buscarDispositivo(this)"></td><td><input type="text" class="ub-dispositivo" readonly placeholder="..."></td><td><input type="text" class="desc-dispositivo" readonly placeholder="Esperando código..."></td><td><input type="text"></td><td style="text-align:center;"><button type="button" class="btn-eliminar-fila" onclick="eliminarFila(this)">X</button></td>`;
+      tbody.appendChild(nuevaFila);
+    }
+
+    const opcionesAccion = `<option value="">Seleccionar...</option><option value="Abre mordaza">Abre mordaza</option><option value="Cierra mordaza">Cierra mordaza</option><option value="Abre luneta 1">Abre luneta 1</option><option value="Cierra luneta 1">Cierra luneta 1</option><option value="Abre luneta 2">Abre luneta 2</option><option value="Cierra luneta 2">Cierra luneta 2</option><option value="Abre contrapunta">Abre contrapunta</option><option value="Cierra contrapunta">Cierra contrapunta</option><option value="Cierra posic. conex. 1">Cierra posic. conex. 1</option><option value="Cierra posic. conex. 2">Cierra posic. conex. 2</option><option value="Abre posic. Ancl. Lat.">Abre posic. Ancl. Lat.</option><option value="Cierra posic. Ancl. Lat.">Cierra posic. Ancl. Lat.</option>`;
+    const opcionesClampeo = `<option value="">Select...</option><option value="201">201</option><option value="202">202</option><option value="203">203</option><option value="204">204</option><option value="205">205</option><option value="206">206</option><option value="207">207</option><option value="208">208</option><option value="209">209</option><option value="210">210</option><option value="211">211</option><option value="212">212</option><option value="213">213</option><option value="214">214</option><option value="215">215</option><option value="216">216</option><option value="218">218</option><option value="219">219</option><option value="220">220</option><option value="222">222</option><option value="224">224</option><option value="226">226</option><option value="228">228</option><option value="229">229</option><option value="230">230</option><option value="231">231</option><option value="232">232</option><option value="233">233</option><option value="234">234</option><option value="235">235</option><option value="236">236</option><option value="237">237</option><option value="238">238</option><option value="239">239</option><option value="240">240</option><option value="241">241</option><option value="242">242</option><option value="243">243</option><option value="244">244</option>`;
+
+    function agregarFilaClampeo(idTablaCuerpo) {
+      const tbody = document.getElementById(idTablaCuerpo);
+      if (tbody.children.length >= 6) return;
+      let nuevoOrden = (tbody.children.length + 1) + "°";
+      const nuevaFila = document.createElement('tr');
+      nuevaFila.innerHTML = `<td><input type="text" value="${nuevoOrden}" readonly></td><td><select>${opcionesAccion}</select></td><td><select>${opcionesClampeo}</select></td><td><input type="number" min="1" max="6" placeholder="1-6"></td><td style="text-align:center;"><button type="button" class="btn-eliminar-fila" onclick="eliminarFila(this)">X</button></td>`;
+      tbody.appendChild(nuevaFila);
+    }
+
+    function eliminarFila(boton) { 
+      const tbody = boton.closest('tbody');
+      boton.closest('tr').remove(); 
+      if (tbody.id.includes('clamp')) {
+        const filas = tbody.querySelectorAll('tr');
+        filas.forEach((fila, index) => { fila.querySelector('td:first-child input').value = (index + 1) + "°"; });
+      }
+    }
+
+    // Funciones Fotográficas y Variables Originales
+    let fotoComprimidaE1 = null; 
+    let fotoComprimidaE2 = null;
+    let fotoOriginalE1 = ""; // <-- NUEVO: Para no perder la foto al editar
+    let fotoOriginalE2 = ""; 
+
+    function procesarFoto(event, estacion) {
+      const archivo = event.target.files[0];
+      if (!archivo) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width; let height = img.height;
+          if (width > height) { if (width > 800) { height *= 800 / width; width = 800; } } else { if (height > 600) { width *= 600 / height; height = 600; } }
+          canvas.width = width; canvas.height = height;
+          canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+          const fotoTexto = canvas.toDataURL('image/jpeg', 0.8);
+          document.getElementById('previewImg' + estacion).src = fotoTexto;
+          document.getElementById('previewContainer' + estacion).style.display = 'block';
+          document.getElementById('inputFoto' + estacion).style.display = 'none';
+          if(estacion === 'E1') fotoComprimidaE1 = fotoTexto.split(',')[1]; 
+          if(estacion === 'E2') fotoComprimidaE2 = fotoTexto.split(',')[1];
+        }
+        img.src = e.target.result;
+      }
+      reader.readAsDataURL(archivo);
+    }
+
+    function eliminarFoto(estacion) {
+      document.getElementById('inputFoto' + estacion).value = ""; 
+      document.getElementById('previewImg' + estacion).src = "";
+      document.getElementById('previewContainer' + estacion).style.display = 'none';
+      document.getElementById('inputFoto' + estacion).style.display = 'block';
+      if(estacion === 'E1') { fotoComprimidaE1 = null; fotoOriginalE1 = ""; }
+      if(estacion === 'E2') { fotoComprimidaE2 = null; fotoOriginalE2 = ""; }
+    }
+
+    // --- CONEXIÓN WEB ---
+    async function cargarBaseDeDatos() {
+      try {
+        const respuesta = await fetch(URL_APLICACION_WEB);
+        const paqueteMaestro = await respuesta.json(); 
+        bdProductos = paqueteMaestro.productos || {}; bdDispositivos = paqueteMaestro.dispositivosDict || {}; 
+        document.getElementById('descTubo').placeholder = "Esperando código...";
+        document.getElementById('descVastago').placeholder = "Esperando código...";
+      } catch (error) { console.error("Error conectando:", error); }
+    }
+
+    function activarAutocompletadoProductos(idInputCodigo, idInputDesc) {
+      document.getElementById(idInputCodigo).addEventListener('input', function() {
+        const codigo = this.value.trim();
+        document.getElementById(idInputDesc).value = codigo === "" ? "" : (bdProductos[codigo] || "No encontrado");
+      });
+    }
+
+    function buscarDispositivo(inputCodigo) {
+      const fila = inputCodigo.closest('tr');
+      const codigo = inputCodigo.value.trim();
+      if (codigo === "") { fila.querySelector('.desc-dispositivo').value = ""; fila.querySelector('.ub-dispositivo').value = ""; } 
+      else if (bdDispositivos[codigo]) { fila.querySelector('.desc-dispositivo').value = bdDispositivos[codigo].descripcion; fila.querySelector('.ub-dispositivo').value = bdDispositivos[codigo].ubicacion; } 
+      else { fila.querySelector('.desc-dispositivo').value = "No encontrado"; fila.querySelector('.ub-dispositivo').value = "-"; }
+    }
+
+    // --- LÓGICA DE EDICIÓN MEJORADA ---
+    async function cargarDatosEdicion(codigo) {
+      const btn = document.getElementById('btnGuardar');
+      btn.innerText = "💾 Guardar Nueva Revisión";
+      btn.style.background = "#2563eb";
+      
+      try {
+        const res = await fetch(`${URL_APLICACION_WEB}?accion=buscar&codigo=${codigo}`);
+        const j = await res.json();
+        if (j.status === 'Exito') {
+          const d = j.data;
+          
+          // Tubo y Vástago (Asignamos Directo para evitar "No encontrado")
+          document.getElementById('codigoTubo').value = d.codigoTubo;
+          document.getElementById('descTubo').value = d.descTubo || ""; 
+          
+          document.getElementById('codigoVastago').value = d.codigoVastago;
+          document.getElementById('descVastago').value = d.descVastago || ""; 
+          
+          // Incrementar Revisión
+          let revActual = parseInt(d.revision.replace("Rev. ", "")) || 0;
+          let nuevaRev = revActual + 1;
+          const campoRevision = document.getElementById('campoRevision');
+          campoRevision.setAttribute('data-rev', nuevaRev);
+          campoRevision.value = "Rev. " + (nuevaRev < 10 ? "0" + nuevaRev : nuevaRev);
+
+          document.getElementById('progE1').value = d.progE1 || "";
+          document.getElementById('obsE1').value = d.obsE1 || "";
+          document.getElementById('progE2').value = d.progE2 || "";
+          document.getElementById('obsE2').value = d.obsE2 || "";
+
+          fotoOriginalE1 = d.fotoE1 || "";
+          fotoOriginalE2 = d.fotoE2 || "";
+
+          // --- FIX FOTOS: Endpoint 'thumbnail' para saltar restricciones ---
+          function obtenerUrlDirecta(urlDrive) {
+            if (!urlDrive) return "";
+            var match = urlDrive.match(/[-\w]{25,}/); // Atrapa el ID de Drive
+            return match ? "https://drive.google.com/thumbnail?id=" + match[0] + "&sz=w1000" : urlDrive;
+          }
+
+          if (fotoOriginalE1.trim() !== "") {
+            document.getElementById('previewImgE1').src = obtenerUrlDirecta(fotoOriginalE1);
+            document.getElementById('previewContainerE1').style.display = 'block';
+            document.getElementById('inputFotoE1').style.display = 'none';
+          }
+          if (fotoOriginalE2.trim() !== "") {
+            document.getElementById('previewImgE2').src = obtenerUrlDirecta(fotoOriginalE2);
+            document.getElementById('previewContainerE2').style.display = 'block';
+            document.getElementById('inputFotoE2').style.display = 'none';
+          }
+
+          // Cargar Tablas
+          cargarTablaDispositivos('cuerpo-disp-e1', d.dispE1);
+          cargarTablaDispositivos('cuerpo-disp-e2', d.dispE2);
+          cargarTablaClampeo('cuerpo-clamp-e1', d.clampE1);
+          cargarTablaClampeo('cuerpo-clamp-e2', d.clampE2);
+        }
+      } catch(e) { console.error("Error cargando edición:", e); }
+    }
+
+    // Funciones para Reconstruir las Tablas
+    function cargarTablaDispositivos(idTbody, datos) {
+      const tbody = document.getElementById(idTbody);
+      tbody.innerHTML = ''; 
+      if (!datos || datos.length === 0) { agregarFilaDispositivo(idTbody); return; } 
+      
+      datos.forEach(filaData => {
+        const nuevaFila = document.createElement('tr');
+        nuevaFila.innerHTML = `<td><input type="number" value="${filaData[0] || ''}"></td><td><input type="number" oninput="buscarDispositivo(this)" value="${filaData[1] || ''}"></td><td><input type="text" class="ub-dispositivo" readonly value="${filaData[2] || ''}"></td><td><input type="text" class="desc-dispositivo" readonly value="${filaData[3] || ''}"></td><td><input type="text" value="${filaData[4] || ''}"></td><td style="text-align:center;"><button type="button" class="btn-eliminar-fila" onclick="eliminarFila(this)">X</button></td>`;
+        tbody.appendChild(nuevaFila);
+      });
+    }
+
+    function cargarTablaClampeo(idTbody, datos) {
+      const tbody = document.getElementById(idTbody);
+      tbody.innerHTML = ''; 
+      if (!datos || datos.length === 0) { agregarFilaClampeo(idTbody); return; } 
+      
+      datos.forEach(filaData => {
+        const nuevaFila = document.createElement('tr');
+        let selectAccion = opcionesAccion.replace(`value="${filaData[1]}"`, `value="${filaData[1]}" selected`);
+        let selectClampeo = opcionesClampeo.replace(`value="${filaData[2]}"`, `value="${filaData[2]}" selected`);
+        nuevaFila.innerHTML = `<td><input type="text" value="${filaData[0] || ''}" readonly></td><td><select>${selectAccion}</select></td><td><select>${selectClampeo}</select></td><td><input type="number" min="1" max="6" value="${filaData[3] || ''}" placeholder="1-6"></td><td style="text-align:center;"><button type="button" class="btn-eliminar-fila" onclick="eliminarFila(this)">X</button></td>`;
+        tbody.appendChild(nuevaFila);
+      });
+    }
+
+    // --- GUARDADO ---
+    function extraerDatosTabla(idTbody) {
+      const filas = document.querySelectorAll('#' + idTbody + ' tr');
+      const datos = [];
+      filas.forEach(fila => {
+        const inputs = fila.querySelectorAll('input, select');
+        const filaData = Array.from(inputs).map(inp => inp.value);
+        if (filaData.join('').trim() !== '') { datos.push(filaData); }
+      });
+      return datos;
+    }
+
+    const btnGuardar = document.getElementById('btnGuardar');
+    const campoRevision = document.getElementById('campoRevision');
+
+    btnGuardar.addEventListener('click', async function() {
+      const codTubo = document.getElementById('codigoTubo').value.trim();
+      if (!codTubo) { 
+        alert("El código de Conjunto Tubo es obligatorio para guardar."); 
+        document.getElementById('codigoTubo').focus();
+        return; 
+      }
+
+      this.disabled = true;
+      this.textContent = "Guardando en la nube... ⏳";
+
+      const paqueteFinal = {
+        accion: 'guardar_instructivo',
+        operario: urlParams.get('operario') || "No registrado",
+        fecha: document.getElementById('fechaActual').value,
+        maquina: document.getElementById('campoMaquina').value,
+        revision: campoRevision.value,
+        codigoTubo: codTubo,
+        descTubo: document.getElementById('descTubo').value,
+        codigoVastago: document.getElementById('codigoVastago').value,
+        descVastago: document.getElementById('descVastago').value,
+        
+        // FOTOS: Enviamos la nueva (si hay) y la vieja por si no subió nada
+        progE1: document.getElementById('progE1').value,
+        obsE1: document.getElementById('obsE1').value,
+        fotoE1: fotoComprimidaE1,       
+        urlViejaE1: fotoOriginalE1,     
+        dispE1: extraerDatosTabla('cuerpo-disp-e1'),
+        clampE1: extraerDatosTabla('cuerpo-clamp-e1'),
+        
+        progE2: document.getElementById('progE2').value,
+        obsE2: document.getElementById('obsE2').value,
+        fotoE2: fotoComprimidaE2,
+        urlViejaE2: fotoOriginalE2,
+        dispE2: extraerDatosTabla('cuerpo-disp-e2'),
+        clampE2: extraerDatosTabla('cuerpo-clamp-e2')
+      };
+
+      try {
+        await fetch(URL_APLICACION_WEB, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(paqueteFinal)
+        });
+
+        alert("✅ ¡Instructivo guardado exitosamente!");
+        window.location.href = "index.html"; 
+
+      } catch(e) {
+        alert("❌ Error de conexión al guardar.");
+      }
+      this.disabled = false;
+      this.textContent = "Guardar Instructivo Completado";
+    });
+  </script>
+</body>
+</html>

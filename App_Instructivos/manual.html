@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual de Usuario - IT.04</title>
+  <style>
+    :root {
+      --rojo-marca: rgb(163, 0, 0);       
+      --rojo-oscuro: rgb(125, 0, 0);      
+      --gris-fondo: rgb(240, 242, 245);   
+      --gris-oscuro: rgb(67, 63, 64);     
+      --texto-negro: rgb(26, 26, 26);     
+      --blanco: #ffffff;
+    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--gris-fondo); margin: 0; padding: 20px; color: var(--texto-negro); line-height: 1.6; }
+    .contenedor { max-width: 800px; margin: 0 auto; background-color: var(--blanco); padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    
+    .cabecera { text-align: center; border-bottom: 4px solid var(--rojo-marca); padding-bottom: 20px; margin-bottom: 30px; }
+    .cabecera h1 { color: var(--rojo-marca); margin: 0; font-size: 32px; }
+    .cabecera p { color: var(--gris-oscuro); font-size: 18px; margin-top: 10px; }
+    
+    h2 { color: var(--rojo-marca); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 40px; display: flex; align-items: center; gap: 10px; }
+    h3 { color: var(--gris-oscuro); margin-top: 25px; }
+    
+    .paso { background-color: #f9f9f9; border-left: 4px solid var(--rojo-marca); padding: 15px 20px; margin-bottom: 15px; border-radius: 0 5px 5px 0; }
+    .paso strong { color: var(--rojo-marca); }
+    
+    .alerta { background-color: #fff3cd; color: #856404; padding: 15px; border-radius: 5px; border-left: 5px solid #ffeeba; margin: 20px 0; font-weight: bold; }
+    .tip { background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; border-left: 5px solid #c3e6cb; margin: 20px 0; }
+    
+    ul { padding-left: 20px; }
+    li { margin-bottom: 10px; }
+    
+    .btn-volver { display: inline-block; background-color: var(--gris-oscuro); color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; margin-bottom: 20px; transition: 0.3s; }
+    .btn-volver:hover { background-color: #000; }
+    
+    .boton-ejemplo { display: inline-block; background-color: var(--rojo-marca); color: white; padding: 5px 10px; border-radius: 3px; font-size: 14px; font-weight: bold; text-decoration: none; }
+    .boton-ia-ejemplo { display: inline-block; background: linear-gradient(45deg, #6b21a8, #9333ea); color: white; padding: 5px 10px; border-radius: 3px; font-size: 14px; font-weight: bold; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <div class="contenedor">
+    <a href="index.html" class="btn-volver">← Volver a la App</a>
+
+    <div class="cabecera">
+      <h1>📘 Manual de Uso Rápido</h1>
+      <p>App de Instructivos de Puesta a Punto (IT.04)</p>
+    </div>
+
+    <div class="tip">
+      💡 <strong>¡Bienvenido!</strong> Este sistema reemplaza los instructivos de papel. Aquí podrás guardar el historial de armado de piezas, tomar fotos desde la tablet y consultar configuraciones anteriores en segundos.
+    </div>
+
+    <h2>1️⃣ El Menú Principal</h2>
+    <p>Al abrir la aplicación, verás la pantalla de inicio. Antes de hacer nada, debes identificarte:</p>
+    <div class="paso">
+      <ul>
+        <li>Selecciona tu <strong>Nombre</strong> en la primera lista.</li>
+        <li>Selecciona la <strong>Celda (Máquina)</strong> en la que vas a trabajar.</li>
+      </ul>
+    </div>
+    <p>Una vez completado esto, puedes elegir entre crear, buscar un instructivo o preguntarle a la IA.</p>
+
+    <h2>2️⃣ Crear un Nuevo Instructivo</h2>
+    <p>Si presionas <span class="boton-ejemplo">Crear Nuevo Instructivo</span>, ingresarás al formulario de carga. Este está dividido en 3 solapas (Datos Generales, Estación 1 y Estación 2).</p>
+    
+    <h3>🔍 Carga de Códigos (Autocompletado)</h3>
+    <div class="paso">
+      Escribe el número en <strong>Código Conjunto Tubo</strong>. La aplicación buscará automáticamente la descripción en la base de datos de la planta. Haz lo mismo con el Vástago.
+    </div>
+
+    <h3>📷 Toma de Fotografías</h3>
+    <p>En las Estaciones 1 y 2 tienes la opción de adjuntar fotos del armado:</p>
+    <div class="paso">
+      <ul>
+        <li>Toca el botón <strong>"Elegir archivo"</strong>. La tablet te preguntará si quieres usar la Cámara o elegir una foto de la galería.</li>
+        <li>Al tomar la foto, la aplicación la mostrará en pantalla y la optimizará para que suba rápido con el Wi-Fi de la fábrica.</li>
+        <li>Si la foto salió movida o borrosa, presiona el botón rojo con la <strong>"X"</strong> en la esquina de la foto para borrarla e intentar de nuevo.</li>
+      </ul>
+    </div>
+
+    <h3>⚙️ Tablas de Dispositivos y Clampeo</h3>
+    <div class="paso">
+      <ul>
+        <li><strong>Dispositivos:</strong> Presiona "+ Agregar Dispositivo" para sumar filas. Al escribir el Código, la descripción y ubicación se llenarán solas.</li>
+        <li><strong>Clampeo:</strong> Presiona "+ Agregar Secuencia". El número de Orden se pondrá solo. Usa las listas desplegables para elegir la Acción y el Código sin tener que escribir.</li>
+      </ul>
+    </div>
+
+    <div class="alerta">
+      ⚠️ Importante: Revisa que todos los datos estén correctos antes de ir al final y presionar el botón rojo gigante de "Guardar Instructivo Completado". Aguarda unos segundos hasta que salga el cartel verde de Éxito.
+    </div>
+
+    <h2>3️⃣ Buscar, Imprimir y Editar un Instructivo</h2>
+    <p>Si conoces el número exacto del tubo que necesitas consultar, en el Menú Principal, escribe el Código del Tubo en la caja inferior (Ej: 400003) y presiona el botón gris oscuro <strong>Buscar Instructivo</strong>.</p>
+    
+    <p>Cuando la base de datos encuentre el historial, te ofrecerá dos opciones principales:</p>
+    <div class="paso">
+      <ul>
+        <li><span class="boton-ejemplo" style="background-color: #4b5563;">🖨️ Ver / Imprimir</span>: Abre el instructivo en modo de lectura, ideal para llevar a la máquina, revisar las fotos o enviarlo a la impresora en formato PDF.</li>
+        <li style="margin-top: 15px;"><span class="boton-ejemplo" style="background-color: #2563eb;">✏️ Editar</span>: <strong>¡NUEVA FUNCIÓN!</strong> Si notas que un dato cambió, necesitas agregar una observación nueva o modificar el programa de la máquina, usa este botón. Te devolverá al formulario con <strong>todos los datos pre-cargados</strong> (incluyendo fotos y tablas). Al guardar los cambios, el sistema <strong>aumentará automáticamente el número de Revisión</strong> (por ejemplo, de Rev. 00 pasará a Rev. 01) para dejar registro de la actualización sin borrar la historia anterior.</li>
+      </ul>
+    </div>
+
+    <h2>4️⃣ El Asistente Inteligente (IA) ✨</h2>
+    <p>¿No recuerdas el código exacto de un tubo o necesitas saber si hay stock de una herramienta? ¡Pregúntale a la Inteligencia Artificial de la planta!</p>
+    <div class="paso">
+      <ol>
+        <li>En el Menú Principal, toca el botón morado <span class="boton-ia-ejemplo">✨ Pregúntale a la IA</span>.</li>
+        <li>Escribe lo que recuerdes en lenguaje natural. Por ejemplo:
+          <ul>
+            <li><em>"Hice un tubo de 1500mm para Hidroil, ¿cuál era el código?"</em></li>
+            <li><em>"¿Cuántas contrapuntas de código 30 tenemos guardadas y dónde están?"</em></li>
+            <li><em>"¿En qué instructivo antiguo usamos la mordaza C3?"</em></li>
+          </ul>
+        </li>
+        <li>Toca <strong>Enviar</strong>. La IA leerá todo el historial y el inventario en segundos para darte la respuesta exacta.</li>
+      </ol>
+    </div>
+
+    <h2>5️⃣ Gestionar Herramientas (Dispositivos)</h2>
+    <p>Si notas que falta una herramienta o dispositivo en la base de datos para autocompletar:</p>
+    <div class="paso">
+      <ol>
+        <li>En el Menú Principal, selecciona la Máquina.</li>
+        <li>Presiona el botón verde <strong>⚙️ Gestionar Dispositivos de esta Celda</strong>.</li>
+        <li>Escribe el Código, Cantidad, Descripción y Ubicación.</li>
+        <li>Presiona <strong>+ Agregar</strong>.</li>
+      </ol>
+      <em>Nota: El sistema no te dejará guardar un código que ya esté asignado a esa máquina para evitar duplicados.</em>
+    </div>
+
+    <hr style="margin-top: 40px; border: 1px solid #eee;">
+    <p style="text-align: center; color: var(--gris-oscuro); font-size: 14px;">
+      Sistema de Control de Piso de Planta - Desarrollado a Medida
+    </p>
+
+  </div>
+
+</body>
+</html>

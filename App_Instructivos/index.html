@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instructivo de Puesta a Punto - IT.04</title>
+  
+  <style>
+    :root { --rojo-marca: rgb(163, 0, 0); --rojo-oscuro: rgb(125, 0, 0); --gris-fondo: rgb(195, 197, 202); --gris-oscuro: rgb(67, 63, 64); --texto-negro: rgb(26, 26, 26); --blanco: #ffffff; }
+    body { font-family: Arial, sans-serif; background-color: var(--gris-fondo); margin: 0; padding: 20px; color: var(--texto-negro); display: flex; justify-content: center; align-items: center; min-height: 90vh; }
+    .contenedor { background-color: var(--blanco); padding: 40px; border-radius: 8px; width: 100%; max-width: 600px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); position: relative; }
+    h1 { text-align: center; color: var(--rojo-marca); font-size: 26px; line-height: 1.4; border-bottom: 3px solid var(--rojo-marca); padding-bottom: 15px; margin-bottom: 10px; }
+    h2 { color: var(--gris-oscuro); font-size: 20px; margin-bottom: 15px; }
+    .seccion { margin-bottom: 30px; }
+    label { display: block; font-weight: bold; margin-bottom: 10px; color: var(--texto-negro); font-size: 18px; }
+    select, input { width: 100%; padding: 15px; font-size: 18px; border: 1px solid rgb(135,135,135); border-radius: 6px; margin-bottom: 25px; box-sizing: border-box; }
+    select:focus, input:focus { outline: 2px solid var(--rojo-marca); border-color: var(--rojo-marca); }
+    .btn { color: var(--blanco); border: none; padding: 20px; width: 100%; font-size: 22px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-bottom: 10px; transition: 0.3s; }
+    .btn-nuevo { background-color: var(--rojo-marca); }
+    .btn-nuevo:hover { background-color: var(--rojo-oscuro); }
+    .btn-buscar { background-color: var(--gris-oscuro); }
+    .btn-buscar:hover { background-color: rgb(40, 38, 39); }
+    .btn-gestion { background-color: #4CAF50; padding: 15px; font-size: 18px; margin-top: -10px; } 
+    
+    /* Botón Mágico de IA */
+    .btn-ia { background: linear-gradient(45deg, #6b21a8, #9333ea); color: white; padding: 15px; font-size: 18px; margin-top: 10px; box-shadow: 0 4px 10px rgba(147, 51, 234, 0.4); }
+    .btn-ia:hover { background: linear-gradient(45deg, #581c87, #7e22ce); }
+
+    hr { margin: 30px 0; border: 0; border-top: 2px dashed rgb(179,179,179); }
+
+    /* Modales compartidos */
+    .modal-fondo { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+    .modal-contenido { background-color: var(--blanco); padding: 30px; border-radius: 8px; width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gris-oscuro); padding-bottom: 10px; margin-bottom: 20px; }
+    .modal-header h2 { margin: 0; color: var(--rojo-marca); }
+    .btn-cerrar { background: none; border: none; font-size: 30px; font-weight: bold; color: var(--gris-oscuro); cursor: pointer; }
+    
+    /* Estilos del Chat IA */
+    #chatIA { background-color: #f3f4f6; border-radius: 8px; padding: 20px; min-height: 150px; margin-bottom: 20px; font-size: 16px; line-height: 1.5; white-space: pre-wrap; border: 1px solid #ddd; }
+    .ia-loader { color: #9333ea; font-weight: bold; text-align: center; display: none; }
+
+    /* Estilos Resultado de Búsqueda */
+    #resultadoBusqueda { 
+      margin-top: -15px; 
+      margin-bottom: 20px; 
+      padding: 15px; 
+      border-radius: 8px; 
+      background: #f8fafc; 
+      border: 1px solid #cbd5e1; 
+      display: none; 
+      text-align: left;
+    }
+    .botones-resultado { display: flex; gap: 10px; margin-top: 10px; }
+    .btn-res { flex: 1; padding: 10px; border-radius: 4px; border: none; color: white; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+  <div class="contenedor">
+    <div style="text-align: center; margin-bottom: -10px; margin-top: -10px;">
+      <img src="logo.png" alt="Logo Empresa" style="max-height: 80px; width: auto;" onerror="this.style.display='none'">
+    </div>
+    <h1>Instructivo de Puesta a Punto - IT.04</h1>
+    <div style="text-align: right; margin-bottom: 20px;"><a href="manual.html" style="color: rgb(163,0,0); font-weight: bold; text-decoration: none;">❓ Ver Manual de Ayuda</a></div>
+    
+    <div class="seccion">
+      <h2>Paso 1: Tu Información</h2>
+      <select id="operario" onchange="guardarPreferencia('operario', this.value)">
+        <option value="">-- Nombre del Operario --</option>
+        <option value="Mariano Minen">Mariano Minen</option>
+        <option value="Gabriel Aranda">Gabriel Aranda</option>
+      </select>
+
+      <select id="celda" onchange="guardarPreferencia('celda', this.value)">
+        <option value="">-- Selecciona la Celda --</option>
+        <option value="65 (KUKA KR5)">65 (KUKA KR5)</option>
+        <option value="97 - KUKA KR C4">97 - KUKA KR C4</option>
+      </select>
+      
+      <button class="btn btn-gestion" id="btnAbrirGestion">⚙️ Gestionar Dispositivos de esta Celda</button>
+    </div>
+
+    <div class="seccion">
+      <h2>Paso 2: Acción</h2>
+      <button class="btn btn-nuevo" id="btnCrear">Crear Nuevo Instructivo</button>
+      <hr>
+      <label>Buscar instructivo existente:</label>
+      <input type="number" id="buscarCodigo" placeholder="Si sabes el código, ej: 70021">
+      <button class="btn btn-buscar" id="btnBuscar">Buscar Instructivo</button>
+
+      <div id="resultadoBusqueda"></div>
+      
+      <button class="btn btn-ia" id="btnAbrirIA">✨ ¿No recuerdas el código? Pregúntale a la IA</button>
+    </div>
+  </div>
+
+  <div class="modal-fondo" id="modalIA">
+    <div class="modal-contenido" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 style="color: #9333ea;">✨ Asistente de Planta IA</h2>
+        <button class="btn-cerrar" id="btnCerrarIA">&times;</button>
+      </div>
+      <p style="color: #555;">Dime qué recuerdas del instructivo (cliente, medidas, herramientas) y buscaré en el historial por ti:</p>
+      <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <input type="text" id="inputIA" placeholder="Ej: Tubo 1500 hidroil..." style="margin-bottom: 0;">
+        <button class="btn btn-ia" id="btnEnviarIA" style="margin-top: 0; width: auto; padding: 0 20px;">Enviar</button>
+      </div>
+      <div class="ia-loader" id="loaderIA">Pensando y buscando en la base de datos... 🧠⏳</div>
+      <div id="chatIA">¡Hola! Soy tu asistente inteligente. Escribe arriba lo que recuerdes y te ayudaré a encontrar el código.</div>
+    </div>
+  </div>
+
+  <div class="modal-fondo" id="modalGestion">
+    <div class="modal-contenido">
+      <div class="modal-header"><h2>Gestión - Celda <span id="tituloCelda">XX</span></h2><button class="btn-cerrar" id="btnCerrarGestion">&times;</button></div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr 2fr 1fr auto; gap:10px; background:#f0f0f0; padding:15px; border-radius:6px; margin-bottom:20px;">
+        <input type="number" id="nuevoCod" placeholder="Cód"><input type="number" id="nuevoCant" placeholder="Cant" value="2"><input type="text" id="nuevoDesc" placeholder="Desc."><input type="text" id="nuevoUb" placeholder="Ub."><button id="btnAgregarDB" style="background:rgb(163,0,0); color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">+ Add</button>
+      </div>
+      <table style="width:100%; border-collapse:collapse;" id="tablaVisual">
+        <thead><tr style="background:var(--gris-oscuro); color:white;"><th>Cód</th><th>Cant</th><th>Desc</th><th>Ub</th><th>Acción</th></tr></thead>
+        <tbody id="cuerpoTablaGestion"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const URL_APLICACION_WEB = "https://script.google.com/macros/s/AKfycbwgX5Y0eKXWBx6mrUYAEl3RZyX5VrAHd_WloEENa7KSGzCP1EKDttrDBC3KPVU5mRDNIQ/exec";
+
+    // --- 1. LÓGICA DE MEMORIA (LocalStorage) ---
+    // Esto se ejecuta apenas carga la página para recuperar lo guardado
+    document.addEventListener('DOMContentLoaded', () => {
+      const opGuardado = localStorage.getItem('app_operario');
+      const celGuardada = localStorage.getItem('app_celda');
+      
+      if(opGuardado) document.getElementById('operario').value = opGuardado;
+      if(celGuardada) document.getElementById('celda').value = celGuardada;
+    });
+
+    // Función para guardar cada vez que cambian el select
+    function guardarPreferencia(clave, valor) {
+      localStorage.setItem('app_' + clave, valor);
+    }
+    // -------------------------------------------
+
+    // --- LÓGICA DE BOTONES ---
+    document.getElementById('btnCrear').addEventListener('click', function() {
+      const op = document.getElementById('operario').value;
+      const cel = document.getElementById('celda').value;
+      if(!op || !cel) { alert("⚠️ Por favor selecciona tu NOMBRE y la MÁQUINA antes de continuar."); return; }
+      
+      window.location.href = `formulario.html?maquina=${encodeURIComponent(cel)}&operario=${encodeURIComponent(op)}`; 
+    });
+
+    document.getElementById('btnBuscar').addEventListener('click', async function() {
+      const codigo = document.getElementById('buscarCodigo').value.trim();
+      const resDiv = document.getElementById('resultadoBusqueda');
+      
+      if(codigo === "") { alert("Ingresa un código."); return; }
+      
+      resDiv.innerHTML = "Buscando datos... ⏳";
+      resDiv.style.display = "block";
+
+      try {
+        const resp = await fetch(`${URL_APLICACION_WEB}?accion=buscar&codigo=${codigo}`);
+        const json = await resp.json();
+        
+        if(json.status === 'Exito') {
+          const d = json.data;
+          // Guardamos la máquina del instructivo en una variable para validarla después
+          const maquinaInstructivo = d.maquina; 
+
+          resDiv.innerHTML = `
+            <p style="margin:0; font-size:14px;"><strong>Tubo:</strong> ${d.codigoTubo} - ${d.descTubo}</p>
+            <p style="margin:5px 0; font-size:14px;"><strong>Rev:</strong> <span style="color:red; font-weight:bold;">${d.revision}</span> | <strong>Máquina:</strong> ${d.maquina}</p>
+            <div class="botones-resultado">
+              <button onclick="intentarEditar('${d.codigoTubo}', '${maquinaInstructivo}')" class="btn-res" style="background:#2563eb;">✏️ Editar</button>
+              
+              <a href="vista_instructivo.html?codigo=${d.codigoTubo}" class="btn-res" style="background:#4b5563;">🖨️ Ver / Imprimir</a>
+            </div>
+          `;
+        } else {
+          resDiv.innerHTML = "❌ No se encontró el instructivo.";
+        }
+      } catch(e) {
+        resDiv.innerHTML = "⚠️ Error conectando con la base de datos.";
+      }
+    });
+
+    // --- NUEVA FUNCIÓN: VALIDAR ANTES DE EDITAR ---
+    function intentarEditar(codigoTubo, maquinaInstructivo) {
+      const opActual = document.getElementById('operario').value;
+      const celActual = document.getElementById('celda').value;
+
+      // 1. Validar que se haya identificado
+      if (!opActual || !celActual) {
+        alert("⚠️ ATENCIÓN:\n\nPara editar, primero debes seleccionar tu NOMBRE y la MÁQUINA en el menú de arriba.\n\nEsto es necesario para registrar quién hizo el cambio.");
+        // Hacemos foco en el select para ayudar al usuario
+        document.getElementById('operario').focus();
+        return;
+      }
+
+      // 2. Validar que la máquina coincida (Seguridad)
+      if (celActual !== maquinaInstructivo) {
+        alert(`⛔ ERROR DE MÁQUINA:\n\nEstás intentando editar un instructivo de la "${maquinaInstructivo}", pero en el menú seleccionaste la "${celActual}".\n\nPor favor, cambia la selección de la máquina en el menú para evitar errores.`);
+        return;
+      }
+
+      // 3. Si todo está bien, viajamos al formulario
+      window.location.href = `formulario.html?accion=editar&codigo=${codigoTubo}&maquina=${encodeURIComponent(celActual)}&operario=${encodeURIComponent(opActual)}`;
+    }
+
+    // --- LÓGICA IA Y GESTIÓN (SIN CAMBIOS) ---
+    const modalIA = document.getElementById('modalIA');
+    const inputIA = document.getElementById('inputIA');
+    const btnEnviarIA = document.getElementById('btnEnviarIA');
+    const chatIA = document.getElementById('chatIA');
+    const loaderIA = document.getElementById('loaderIA');
+
+    document.getElementById('btnAbrirIA').addEventListener('click', () => modalIA.style.display = 'flex');
+    document.getElementById('btnCerrarIA').addEventListener('click', () => modalIA.style.display = 'none');
+
+    btnEnviarIA.addEventListener('click', async function() {
+      const consulta = inputIA.value.trim();
+      if(consulta === "") return;
+      chatIA.style.display = 'none'; loaderIA.style.display = 'block'; inputIA.disabled = true; this.disabled = true;
+      try {
+        const respuesta = await fetch(URL_APLICACION_WEB + "?accion=buscar_ia&query=" + encodeURIComponent(consulta));
+        const resultado = await respuesta.json();
+        loaderIA.style.display = 'none'; chatIA.style.display = 'block';
+        chatIA.innerHTML = resultado.status === 'Exito' ? resultado.respuesta : "❌ Hubo un error procesando tu consulta.";
+      } catch (error) { loaderIA.style.display = 'none'; chatIA.style.display = 'block'; chatIA.innerHTML = "⚠️ Error de red."; }
+      inputIA.disabled = false; this.disabled = false; inputIA.value = "";
+    });
+
+    let listaGlobalDispositivos = []; let maquinaActual = "";
+    document.getElementById('btnAbrirGestion').addEventListener('click', async function() {
+      maquinaActual = document.getElementById('celda').value; if(maquinaActual === "") { alert("Selecciona la Celda."); return; }
+      document.getElementById('tituloCelda').textContent = maquinaActual; document.getElementById('modalGestion').style.display = 'flex';
+      try { const r = await fetch(URL_APLICACION_WEB); const p = await r.json(); listaGlobalDispositivos = p.dispositivosArray || []; renderizarTabla(); } catch(e) {}
+    });
+    function renderizarTabla() {
+      document.getElementById('cuerpoTablaGestion').innerHTML = "";
+      listaGlobalDispositivos.filter(d => d.maquina === maquinaActual).forEach(d => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td style="border:1px solid #ccc; padding:5px;">${d.codigo}</td><td style="border:1px solid #ccc; padding:5px;">${d.cant}</td><td style="border:1px solid #ccc; padding:5px;">${d.desc}</td><td style="border:1px solid #ccc; padding:5px;">${d.ub}</td><td style="border:1px solid #ccc; padding:5px;"><button onclick="borrarFila('${d.codigo}')" style="background:red;color:white;border:none;border-radius:3px;">X</button></td>`;
+        document.getElementById('cuerpoTablaGestion').appendChild(tr);
+      });
+    }
+    document.getElementById('btnAgregarDB').addEventListener('click', async function() {
+      const cod = document.getElementById('nuevoCod').value.trim(); const cant = document.getElementById('nuevoCant').value.trim(); const desc = document.getElementById('nuevoDesc').value.trim(); const ub = document.getElementById('nuevoUb').value.trim();
+      if(!cod || !desc) return;
+      if (listaGlobalDispositivos.find(d => d.maquina === maquinaActual && d.codigo.toString() === cod)) { alert("Código duplicado"); return; }
+      this.textContent = "...";
+      try { await fetch(URL_APLICACION_WEB, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ accion: 'agregar', maquina: maquinaActual, codigo: cod, cant: cant, desc: desc, ub: ub }) }); } catch(e) {}
+      listaGlobalDispositivos.push({ maquina: maquinaActual, codigo: cod, cant: cant, desc: desc, ub: ub }); renderizarTabla();
+      document.getElementById('nuevoCod').value = ""; document.getElementById('nuevoDesc').value = ""; document.getElementById('nuevoUb').value = ""; this.textContent = "+ Add";
+    });
+    window.borrarFila = async function(cod) {
+      if(confirm("¿Eliminar código " + cod + "?")) {
+        try { await fetch(URL_APLICACION_WEB, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ accion: 'eliminar', maquina: maquinaActual, codigo: cod }) }); } catch(e) {}
+        listaGlobalDispositivos = listaGlobalDispositivos.filter(d => !(d.maquina === maquinaActual && d.codigo === cod)); renderizarTabla();
+      }
+    };
+    document.getElementById('btnCerrarGestion').addEventListener('click', () => document.getElementById('modalGestion').style.display = 'none');
+  </script>
+</body>
+</html>

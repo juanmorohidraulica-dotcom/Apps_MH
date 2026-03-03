@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Impresión de Instructivo</title>
+  <style>
+    /* Diseño limpio tipo "Hoja A4" */
+    body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; color: #1a1a1a; display: flex; flex-direction: column; align-items: center; }
+    .hoja { background-color: white; width: 100%; max-width: 900px; padding: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); box-sizing: border-box; }
+    
+    /* --- CABECERA CON LOGO INCORPORADO --- */
+    .cabecera { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid rgb(163, 0, 0); padding-bottom: 15px; margin-bottom: 20px; }
+    .grupo-titulos { display: flex; align-items: center; gap: 20px; }
+    .grupo-titulos h1 { color: rgb(163, 0, 0); margin: 0; font-size: 24px; line-height: 1.2; }
+    .grupo-titulos p { margin: 5px 0 0 0; color: #555; font-size: 16px; font-weight: bold; }
+    
+    .datos-cabecera { text-align: right; font-size: 14px; font-weight: bold; color: #555; }
+    .datos-cabecera p { margin: 5px 0; }
+    
+    .seccion-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background-color: #f9f9f9; padding: 15px; border: 1px solid #ccc; margin-bottom: 20px; }
+    .seccion-info p { margin: 5px 0; font-size: 16px; }
+    .seccion-info span { font-weight: bold; }
+
+    h2 { color: rgb(163, 0, 0); font-size: 20px; border-bottom: 2px solid #ddd; padding-bottom: 5px; margin-top: 30px; }
+    
+    .estacion { margin-bottom: 40px; }
+    .info-programa { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+    
+    .foto-estacion { width: 100%; max-width: 500px; height: auto; border: 2px solid #ccc; display: block; margin: 15px auto; object-fit: contain; }
+    
+    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 14px; }
+    th, td { border: 1px solid #aaa; padding: 8px; text-align: left; }
+    th { background-color: #eee; font-weight: bold; }
+    
+    .obs-box { border: 1px dashed #aaa; padding: 10px; background-color: #fffcdf; font-style: italic; min-height: 50px; }
+
+    /* Barra de herramientas que no se imprime */
+    .barra-herramientas { width: 100%; max-width: 900px; display: flex; justify-content: space-between; margin-bottom: 20px; }
+    .grupo-botones { display: flex; gap: 10px; }
+    .btn { padding: 12px 20px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; border-radius: 4px; color: white; transition: 0.2s; }
+    .btn-imprimir { background-color: #4CAF50; }
+    .btn-volver { background-color: #555; }
+    .btn-eliminar { background-color: rgb(163, 0, 0); }
+    .btn-eliminar:hover { background-color: rgb(120, 0, 0); }
+    
+    #pantallaCarga { text-align: center; font-size: 24px; font-weight: bold; color: rgb(163, 0, 0); padding: 100px; }
+
+    @media print {
+      body { background-color: white; padding: 0; }
+      .hoja { box-shadow: none; padding: 0; }
+      .barra-herramientas { display: none !important; } /* Oculta los botones al imprimir */
+    }
+  </style>
+</head>
+<body>
+
+  <div class="barra-herramientas" id="barra" style="display: none;">
+    <button class="btn btn-volver" onclick="window.location.href='index.html'">← Volver al Menú</button>
+    <div class="grupo-botones">
+      <button class="btn btn-eliminar" onclick="eliminarInstructivo()">🗑️ Eliminar Instructivo</button>
+      <button class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir / PDF</button>
+    </div>
+  </div>
+
+  <div id="pantallaCarga">Buscando instructivo en la base de datos... ⏳</div>
+
+  <div class="hoja" id="hojaInstructivo" style="display: none;">
+    
+    <!-- ENCABEZADO MEJORADO CON LOGO Y OPERARIO -->
+    <div class="cabecera">
+      <div class="grupo-titulos">
+        <img src="logo.png" alt="Logo" style="max-height: 60px; width: auto;" onerror="this.style.display='none'">
+        <div>
+          <h1>Instructivo Puesta a Punto</h1>
+          <p>Celda Soldadura</p>
+        </div>
+      </div>
+      <div class="datos-cabecera">
+        <p>Fecha: <span id="lblFecha" style="color:#000;">--/--/----</span></p>
+        <p>Máquina: <span id="lblMaquina" style="color:#000;">--</span></p>
+        <!-- NUEVO CAMPO DE OPERARIO -->
+        <p>Operario: <span id="lblOperario" style="color:#0056b3;">--</span></p>
+        <p style="margin-top: 10px;"><span style="color:rgb(163,0,0); border: 1px solid rgb(163,0,0); padding: 4px 8px; border-radius: 4px; background: #fff;">Revisión: <span id="lblRevision">--</span></span></p>
+      </div>
+    </div>
+
+    <div class="seccion-info">
+      <p><span>Cód. Tubo:</span> <span id="lblCodTubo">--</span></p>
+      <p><span>Cód. Vástago:</span> <span id="lblCodVastago">--</span></p>
+      <p><span>Desc. Tubo:</span> <span id="lblDescTubo">--</span></p>
+      <p><span>Desc. Vástago:</span> <span id="lblDescVastago">--</span></p>
+    </div>
+
+    <div class="estacion" id="seccionE1">
+      <h2>Estación 1</h2>
+      <p class="info-programa">Programa E1: <span id="lblProgE1" style="color: #0056b3;">--</span></p>
+      <img id="imgE1" class="foto-estacion" style="display:none;" alt="Foto Estación 1">
+      <h4>Dispositivos</h4>
+      <table id="tablaDispE1">
+        <thead><tr><th>Cant.</th><th>Código</th><th>Ubicación</th><th>Descripción</th><th>Distancia</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <h4>Secuencia de Clampeo</h4>
+      <table id="tablaClampE1">
+        <thead><tr><th>Orden</th><th>Acción</th><th>Clampeo</th><th>Salida</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <h4>Observaciones</h4>
+      <div class="obs-box" id="lblObsE1">--</div>
+    </div>
+
+    <div class="estacion" id="seccionE2">
+      <h2>Estación 2</h2>
+      <p class="info-programa">Programa E2: <span id="lblProgE2" style="color: #0056b3;">--</span></p>
+      <img id="imgE2" class="foto-estacion" style="display:none;" alt="Foto Estación 2">
+      <h4>Dispositivos</h4>
+      <table id="tablaDispE2">
+        <thead><tr><th>Cant.</th><th>Código</th><th>Ubicación</th><th>Descripción</th><th>Distancia</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <h4>Secuencia de Clampeo</h4>
+      <table id="tablaClampE2">
+        <thead><tr><th>Orden</th><th>Acción</th><th>Clampeo</th><th>Salida</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <h4>Observaciones</h4>
+      <div class="obs-box" id="lblObsE2">--</div>
+    </div>
+  </div>
+
+  <script>
+    // 👇👇👇 ¡PEGA AQUÍ TU ENLACE LARGO DE APPS SCRIPT! 👇👇👇
+    const URL_APLICACION_WEB = "https://script.google.com/macros/s/AKfycbwgX5Y0eKXWBx6mrUYAEl3RZyX5VrAHd_WloEENa7KSGzCP1EKDttrDBC3KPVU5mRDNIQ/exec";
+
+    const parametrosURL = new URLSearchParams(window.location.search);
+    const codigoABuscar = parametrosURL.get('codigo');
+
+    // Mismo convertidor robusto de imágenes que usamos en el formulario
+    function convertirUrlDrive(urlOriginal) {
+      if (!urlOriginal || urlOriginal.trim() === "") return "";
+      var match = urlOriginal.match(/[-\w]{25,}/); // Atrapa el ID de Drive exacto
+      return match ? "https://drive.google.com/thumbnail?id=" + match[0] + "&sz=w1000" : urlOriginal;
+    }
+
+    async function buscarDatos() {
+      if (!codigoABuscar) {
+        document.getElementById('pantallaCarga').innerHTML = "Error: No se indicó qué código buscar.";
+        return;
+      }
+      try {
+        const respuesta = await fetch(URL_APLICACION_WEB + "?accion=buscar&codigo=" + codigoABuscar);
+        const resultado = await respuesta.json();
+        if (resultado.status === 'Exito') {
+          llenarHoja(resultado.data);
+          document.getElementById('pantallaCarga').style.display = 'none';
+          document.getElementById('hojaInstructivo').style.display = 'block';
+          document.getElementById('barra').style.display = 'flex'; 
+        } else {
+          document.getElementById('pantallaCarga').innerHTML = "❌ No se encontró ningún instructivo para el código " + codigoABuscar;
+          document.getElementById('barra').style.display = 'flex'; 
+        }
+      } catch (error) {
+        document.getElementById('pantallaCarga').innerHTML = "⚠️ Error de conexión con la base de datos.";
+      }
+    }
+
+    async function eliminarInstructivo() {
+      const primeraAlerta = confirm("¿Estás a punto de ELIMINAR el instructivo completo del código " + codigoABuscar + ".\n\n¿Estás seguro de que deseas continuar?");
+      if (!primeraAlerta) return; 
+
+      const segundaAlerta = confirm("⚠️ ADVERTENCIA FINAL ⚠️\n\nEsto borrará la información de la base de datos y ELIMINARÁ LAS FOTOS de Google Drive permanentemente.\n\nEsta acción NO se puede deshacer.\n\n¿Confirmas la eliminación definitiva?");
+      if (!segundaAlerta) return; 
+
+      document.getElementById('hojaInstructivo').style.display = 'none';
+      document.getElementById('barra').style.display = 'none';
+      document.getElementById('pantallaCarga').innerHTML = "Eliminando instructivo y borrando fotos de la nube... 🗑️";
+      document.getElementById('pantallaCarga').style.display = 'block';
+
+      try {
+        await fetch(URL_APLICACION_WEB, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ accion: 'eliminar_instructivo', codigo: codigoABuscar })
+        });
+        
+        alert("✅ El instructivo y sus fotos han sido eliminados correctamente.");
+        window.history.back(); 
+
+      } catch(e) {
+        alert("❌ Ocurrió un error al intentar eliminar. Verifica la conexión.");
+        window.location.reload();
+      }
+    }
+
+    function llenarHoja(data) {
+      document.getElementById('lblFecha').textContent = new Date(data.fecha).toLocaleDateString();
+      document.getElementById('lblMaquina').textContent = data.maquina;
+      document.getElementById('lblRevision').textContent = data.revision;
+      
+      // NUEVO: Inyectamos el Operario
+      document.getElementById('lblOperario').textContent = data.operario || "No registrado";
+      
+      document.getElementById('lblCodTubo').textContent = data.codigoTubo;
+      document.getElementById('lblDescTubo').textContent = data.descTubo;
+      document.getElementById('lblCodVastago').textContent = data.codigoVastago || "-";
+      document.getElementById('lblDescVastago').textContent = data.descVastago || "-";
+
+      document.getElementById('lblProgE1').textContent = data.progE1 || "N/A";
+      if(data.fotoE1 && data.fotoE1.trim() !== "") { document.getElementById('imgE1').src = convertirUrlDrive(data.fotoE1); document.getElementById('imgE1').style.display = 'block'; }
+      document.getElementById('lblObsE1').textContent = data.obsE1 || "Sin observaciones.";
+      llenarTabla('tablaDispE1', data.dispE1, 5);
+      llenarTabla('tablaClampE1', data.clampE1, 4);
+
+      document.getElementById('lblProgE2').textContent = data.progE2 || "N/A";
+      if(data.fotoE2 && data.fotoE2.trim() !== "") { document.getElementById('imgE2').src = convertirUrlDrive(data.fotoE2); document.getElementById('imgE2').style.display = 'block'; }
+      document.getElementById('lblObsE2').textContent = data.obsE2 || "Sin observaciones.";
+      llenarTabla('tablaDispE2', data.dispE2, 5);
+      llenarTabla('tablaClampE2', data.clampE2, 4);
+    }
+
+    function llenarTabla(idTabla, filas, maxColumnas) {
+      const tbody = document.querySelector('#' + idTabla + ' tbody');
+      if (!filas || filas.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${maxColumnas}" style="text-align:center; color:#888;">No hay registros</td></tr>`;
+        return;
+      }
+      filas.forEach(filaArray => {
+        const tr = document.createElement('tr');
+        filaArray.forEach((celdaDato, index) => {
+          if (index < maxColumnas) {
+            const td = document.createElement('td');
+            td.textContent = celdaDato || "-";
+            tr.appendChild(td);
+          }
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    buscarDatos();
+  </script>
+</body>
+</html>
