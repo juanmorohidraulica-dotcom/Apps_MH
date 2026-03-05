@@ -73,8 +73,9 @@
 
       <select id="celda" onchange="guardarPreferencia('celda', this.value)">
         <option value="">-- Selecciona la Celda --</option>
+        <!-- Corregido a la versión oficial con paréntesis para la base de datos -->
         <option value="65 (KUKA KR5)">65 (KUKA KR5)</option>
-        <option value="97 - KUKA KR C4">97 - KUKA KR C4</option>
+        <option value="97 (KUKA KR C4)">97 (KUKA KR C4)</option>
       </select>
       
       <button class="btn btn-gestion" id="btnAbrirGestion">⚙️ Gestionar Dispositivos de esta Celda</button>
@@ -94,6 +95,7 @@
     </div>
   </div>
 
+  <!-- MODAL DE ASISTENTE IA -->
   <div class="modal-fondo" id="modalIA">
     <div class="modal-contenido" style="max-width: 600px;">
       <div class="modal-header">
@@ -110,6 +112,7 @@
     </div>
   </div>
 
+  <!-- Modal de Gestión -->
   <div class="modal-fondo" id="modalGestion">
     <div class="modal-contenido">
       <div class="modal-header"><h2>Gestión - Celda <span id="tituloCelda">XX</span></h2><button class="btn-cerrar" id="btnCerrarGestion">&times;</button></div>
@@ -126,21 +129,22 @@
   <script>
     const URL_APLICACION_WEB = "https://script.google.com/macros/s/AKfycbwgX5Y0eKXWBx6mrUYAEl3RZyX5VrAHd_WloEENa7KSGzCP1EKDttrDBC3KPVU5mRDNIQ/exec";
 
-    // --- 1. LÓGICA DE MEMORIA (LocalStorage) ---
-    // Esto se ejecuta apenas carga la página para recuperar lo guardado
+    // --- LÓGICA DE MEMORIA (LocalStorage) ---
     document.addEventListener('DOMContentLoaded', () => {
       const opGuardado = localStorage.getItem('app_operario');
-      const celGuardada = localStorage.getItem('app_celda');
+      let celGuardada = localStorage.getItem('app_celda');
       
+      // FIX de Memoria: Si la memoria guardó un texto viejo con guion, lo forzamos a actualizarse a paréntesis.
+      if(celGuardada === "65 - KUKA KR5") celGuardada = "65 (KUKA KR5)";
+      if(celGuardada === "97 - KUKA KR C4") celGuardada = "97 (KUKA KR C4)";
+
       if(opGuardado) document.getElementById('operario').value = opGuardado;
       if(celGuardada) document.getElementById('celda').value = celGuardada;
     });
 
-    // Función para guardar cada vez que cambian el select
     function guardarPreferencia(clave, valor) {
       localStorage.setItem('app_' + clave, valor);
     }
-    // -------------------------------------------
 
     // --- LÓGICA DE BOTONES ---
     document.getElementById('btnCrear').addEventListener('click', function() {
@@ -166,7 +170,6 @@
         
         if(json.status === 'Exito') {
           const d = json.data;
-          // Guardamos la máquina del instructivo en una variable para validarla después
           const maquinaInstructivo = d.maquina; 
 
           resDiv.innerHTML = `
@@ -174,7 +177,6 @@
             <p style="margin:5px 0; font-size:14px;"><strong>Rev:</strong> <span style="color:red; font-weight:bold;">${d.revision}</span> | <strong>Máquina:</strong> ${d.maquina}</p>
             <div class="botones-resultado">
               <button onclick="intentarEditar('${d.codigoTubo}', '${maquinaInstructivo}')" class="btn-res" style="background:#2563eb;">✏️ Editar</button>
-              
               <a href="vista_instructivo.html?codigo=${d.codigoTubo}" class="btn-res" style="background:#4b5563;">🖨️ Ver / Imprimir</a>
             </div>
           `;
@@ -186,30 +188,30 @@
       }
     });
 
-    // --- NUEVA FUNCIÓN: VALIDAR ANTES DE EDITAR ---
+    // --- NUEVA FUNCIÓN: VALIDACIÓN INTELIGENTE ---
     function intentarEditar(codigoTubo, maquinaInstructivo) {
       const opActual = document.getElementById('operario').value;
       const celActual = document.getElementById('celda').value;
 
-      // 1. Validar que se haya identificado
       if (!opActual || !celActual) {
         alert("⚠️ ATENCIÓN:\n\nPara editar, primero debes seleccionar tu NOMBRE y la MÁQUINA en el menú de arriba.\n\nEsto es necesario para registrar quién hizo el cambio.");
-        // Hacemos foco en el select para ayudar al usuario
         document.getElementById('operario').focus();
         return;
       }
 
-      // 2. Validar que la máquina coincida (Seguridad)
-      if (celActual !== maquinaInstructivo) {
-        alert(`⛔ ERROR DE MÁQUINA:\n\nEstás intentando editar un instructivo de la "${maquinaInstructivo}", pero en el menú seleccionaste la "${celActual}".\n\nPor favor, cambia la selección de la máquina en el menú para evitar errores.`);
+      // EXTRAEMOS SOLO EL NÚMERO (65 o 97) PARA COMPARAR, ASÍ IGNORAMOS GUIONES Y PARÉNTESIS
+      const numCeldaActual = celActual.includes("97") ? "97" : (celActual.includes("65") ? "65" : "");
+      const numMaquinaInst = maquinaInstructivo.includes("97") ? "97" : (maquinaInstructivo.includes("65") ? "65" : "");
+
+      if (numCeldaActual !== numMaquinaInst) {
+        alert(`⛔ ERROR DE MÁQUINA:\n\nEstás intentando editar un instructivo de la Máquina ${numMaquinaInst}, pero en el menú seleccionaste la Máquina ${numCeldaActual}.\n\nPor favor, cambia la selección de la máquina en el menú para evitar errores.`);
         return;
       }
 
-      // 3. Si todo está bien, viajamos al formulario
       window.location.href = `formulario.html?accion=editar&codigo=${codigoTubo}&maquina=${encodeURIComponent(celActual)}&operario=${encodeURIComponent(opActual)}`;
     }
 
-    // --- LÓGICA IA Y GESTIÓN (SIN CAMBIOS) ---
+    // --- LÓGICA IA Y GESTIÓN ---
     const modalIA = document.getElementById('modalIA');
     const inputIA = document.getElementById('inputIA');
     const btnEnviarIA = document.getElementById('btnEnviarIA');
@@ -238,6 +240,7 @@
       document.getElementById('tituloCelda').textContent = maquinaActual; document.getElementById('modalGestion').style.display = 'flex';
       try { const r = await fetch(URL_APLICACION_WEB); const p = await r.json(); listaGlobalDispositivos = p.dispositivosArray || []; renderizarTabla(); } catch(e) {}
     });
+    
     function renderizarTabla() {
       document.getElementById('cuerpoTablaGestion').innerHTML = "";
       listaGlobalDispositivos.filter(d => d.maquina === maquinaActual).forEach(d => {
@@ -246,6 +249,7 @@
         document.getElementById('cuerpoTablaGestion').appendChild(tr);
       });
     }
+
     document.getElementById('btnAgregarDB').addEventListener('click', async function() {
       const cod = document.getElementById('nuevoCod').value.trim(); const cant = document.getElementById('nuevoCant').value.trim(); const desc = document.getElementById('nuevoDesc').value.trim(); const ub = document.getElementById('nuevoUb').value.trim();
       if(!cod || !desc) return;
@@ -255,6 +259,7 @@
       listaGlobalDispositivos.push({ maquina: maquinaActual, codigo: cod, cant: cant, desc: desc, ub: ub }); renderizarTabla();
       document.getElementById('nuevoCod').value = ""; document.getElementById('nuevoDesc').value = ""; document.getElementById('nuevoUb').value = ""; this.textContent = "+ Add";
     });
+    
     window.borrarFila = async function(cod) {
       if(confirm("¿Eliminar código " + cod + "?")) {
         try { await fetch(URL_APLICACION_WEB, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ accion: 'eliminar', maquina: maquinaActual, codigo: cod }) }); } catch(e) {}
