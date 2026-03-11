@@ -161,7 +161,7 @@
     const maquinaRaw = urlParams.get('maquina') || "";
     const idMaquina = maquinaRaw.includes("97") ? "97" : "65";
 
-    let bdProductos = {}; let bdDispositivos = {}; 
+    let bdProductos = {}; let bdDispositivosArray = []; 
 
     document.addEventListener('DOMContentLoaded', async function() {
       // 1. Sincronizar Máquina
@@ -274,7 +274,7 @@
       try {
         const respuesta = await fetch(URL_APLICACION_WEB);
         const paqueteMaestro = await respuesta.json(); 
-        bdProductos = paqueteMaestro.productos || {}; bdDispositivos = paqueteMaestro.dispositivosDict || {}; 
+        bdProductos = paqueteMaestro.productos || {}; bdDispositivosArray = paqueteMaestro.dispositivosArray || []; 
         document.getElementById('descTubo').placeholder = "Esperando código...";
         document.getElementById('descVastago').placeholder = "Esperando código...";
       } catch (error) { console.error("Error conectando:", error); }
@@ -290,9 +290,23 @@
     function buscarDispositivo(inputCodigo) {
       const fila = inputCodigo.closest('tr');
       const codigo = inputCodigo.value.trim();
-      if (codigo === "") { fila.querySelector('.desc-dispositivo').value = ""; fila.querySelector('.ub-dispositivo').value = ""; } 
-      else if (bdDispositivos[codigo]) { fila.querySelector('.desc-dispositivo').value = bdDispositivos[codigo].descripcion; fila.querySelector('.ub-dispositivo').value = bdDispositivos[codigo].ubicacion; } 
-      else { fila.querySelector('.desc-dispositivo').value = "No encontrado"; fila.querySelector('.ub-dispositivo').value = "-"; }
+      const maquinaActual = document.getElementById('campoMaquina').value;
+
+      if (codigo === "") { 
+        fila.querySelector('.desc-dispositivo').value = ""; 
+        fila.querySelector('.ub-dispositivo').value = ""; 
+      } else {
+        // Buscamos en el array filtrando por código y por máquina a la vez
+        const dispositivo = bdDispositivosArray.find(d => d.codigo.toString() === codigo && d.maquina === maquinaActual);
+        
+        if (dispositivo) { 
+          fila.querySelector('.desc-dispositivo').value = dispositivo.desc; 
+          fila.querySelector('.ub-dispositivo').value = dispositivo.ub; 
+        } else { 
+          fila.querySelector('.desc-dispositivo').value = "No encontrado"; 
+          fila.querySelector('.ub-dispositivo').value = "-"; 
+        }
+      }
     }
 
     // --- LÓGICA DE EDICIÓN MEJORADA ---
@@ -411,7 +425,7 @@
 
       const paqueteFinal = {
         accion: 'guardar_instructivo',
-        operario: urlParams.get('operario') || "No registrado",
+        operario: document.getElementById('operario').value,
         fecha: document.getElementById('fechaActual').value,
         maquina: document.getElementById('campoMaquina').value,
         revision: campoRevision.value,
