@@ -29,7 +29,7 @@
     .alerta { background-color: #fff3cd; color: #856404; padding: 15px; border-radius: 5px; border-left: 5px solid #ffeeba; margin: 20px 0; font-weight: bold; }
     .tip { background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; border-left: 5px solid #c3e6cb; margin: 20px 0; }
     
-    ul { padding-left: 20px; }
+    ul, ol { padding-left: 20px; }
     li { margin-bottom: 10px; }
     
     .btn-volver { display: inline-block; background-color: var(--gris-oscuro); color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; margin-bottom: 20px; transition: 0.3s; }
@@ -100,8 +100,21 @@
     <div class="paso">
       <ul>
         <li><span class="boton-ejemplo" style="background-color: #4b5563;">🖨️ Ver / Imprimir</span>: Abre el instructivo en modo de lectura, ideal para llevar a la máquina, revisar las fotos o enviarlo a la impresora en formato PDF.</li>
-        <li style="margin-top: 15px;"><span class="boton-ejemplo" style="background-color: #2563eb;">✏️ Editar</span>: <strong>¡NUEVA FUNCIÓN!</strong> Si notas que un dato cambió, necesitas agregar una observación nueva o modificar el programa de la máquina, usa este botón. Te devolverá al formulario con <strong>todos los datos pre-cargados</strong> (incluyendo fotos y tablas). Al guardar los cambios, el sistema <strong>aumentará automáticamente el número de Revisión</strong> (por ejemplo, de Rev. 00 pasará a Rev. 01) para dejar registro de la actualización sin borrar la historia anterior.</li>
+        <li style="margin-top: 15px;"><span class="boton-ejemplo" style="background-color: #2563eb;">✏️ Editar</span>: Si notas que un dato cambió, necesitas agregar una observación nueva o modificar el programa de la máquina, usa este botón. Te devolverá al formulario con <strong>todos los datos pre-cargados</strong> (incluyendo fotos y tablas). Al guardar los cambios, el sistema <strong>aumentará automáticamente el número de Revisión</strong> (por ejemplo, de Rev. 00 pasará a Rev. 01) para dejar registro de la actualización sin borrar la historia anterior.</li>
       </ul>
+    </div>
+
+    <h3>🗑️ Eliminar un Instructivo</h3>
+    <div class="paso">
+      Si necesitas borrar un instructivo por completo (por ejemplo, si se creó como prueba o por error):
+      <ol>
+        <li>Búscalo y entra a la opción <span class="boton-ejemplo" style="background-color: #4b5563;">🖨️ Ver / Imprimir</span>.</li>
+        <li>En la esquina superior derecha de la barra de herramientas, presiona el botón rojo <span class="boton-ejemplo" style="background-color: rgb(163, 0, 0);">🗑️ Eliminar Instructivo</span>.</li>
+        <li>El sistema te pedirá <strong>dos confirmaciones de seguridad</strong>. Al aceptar ambas, se borrarán definitivamente los datos del historial y las fotos asociadas de Google Drive.</li>
+      </ol>
+      <div class="alerta" style="margin-top: 15px; padding: 10px; font-size: 15px;">
+        ⚠️ ¡Atención! Esta acción es irreversible y no se puede deshacer. Úsala con precaución.
+      </div>
     </div>
 
     <h2>4️⃣ El Asistente Inteligente (IA) ✨</h2>
