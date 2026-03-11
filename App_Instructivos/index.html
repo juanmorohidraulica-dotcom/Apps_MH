@@ -40,16 +40,7 @@
     .ia-loader { color: #9333ea; font-weight: bold; text-align: center; display: none; }
 
     /* Estilos Resultado de Búsqueda */
-    #resultadoBusqueda { 
-      margin-top: -15px; 
-      margin-bottom: 20px; 
-      padding: 15px; 
-      border-radius: 8px; 
-      background: #f8fafc; 
-      border: 1px solid #cbd5e1; 
-      display: none; 
-      text-align: left;
-    }
+    #resultadoBusqueda { margin-top: -15px; margin-bottom: 20px; padding: 15px; border-radius: 8px; background: #f8fafc; border: 1px solid #cbd5e1; display: none; text-align: left; }
     .botones-resultado { display: flex; gap: 10px; margin-top: 10px; }
     .btn-res { flex: 1; padding: 10px; border-radius: 4px; border: none; color: white; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; font-size: 14px; }
   </style>
@@ -73,7 +64,6 @@
 
       <select id="celda" onchange="guardarPreferencia('celda', this.value)">
         <option value="">-- Selecciona la Celda --</option>
-        <!-- Corregido a la versión oficial con paréntesis para la base de datos -->
         <option value="65 (KUKA KR5)">65 (KUKA KR5)</option>
         <option value="97 (KUKA KR C4)">97 (KUKA KR C4)</option>
       </select>
@@ -95,7 +85,6 @@
     </div>
   </div>
 
-  <!-- MODAL DE ASISTENTE IA -->
   <div class="modal-fondo" id="modalIA">
     <div class="modal-contenido" style="max-width: 600px;">
       <div class="modal-header">
@@ -112,12 +101,12 @@
     </div>
   </div>
 
-  <!-- Modal de Gestión -->
   <div class="modal-fondo" id="modalGestion">
     <div class="modal-contenido">
       <div class="modal-header"><h2>Gestión - Celda <span id="tituloCelda">XX</span></h2><button class="btn-cerrar" id="btnCerrarGestion">&times;</button></div>
       <div style="display:grid; grid-template-columns: 1fr 1fr 2fr 1fr auto; gap:10px; background:#f0f0f0; padding:15px; border-radius:6px; margin-bottom:20px;">
-        <input type="number" id="nuevoCod" placeholder="Cód"><input type="number" id="nuevoCant" placeholder="Cant" value="2"><input type="text" id="nuevoDesc" placeholder="Desc."><input type="text" id="nuevoUb" placeholder="Ub."><button id="btnAgregarDB" style="background:rgb(163,0,0); color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">+ Add</button>
+        <!-- SOLUCIÓN AL "2": ELIMINADO EL value="2" -->
+        <input type="number" id="nuevoCod" placeholder="Cód"><input type="number" id="nuevoCant" placeholder="Cant"><input type="text" id="nuevoDesc" placeholder="Desc."><input type="text" id="nuevoUb" placeholder="Ub."><button id="btnAgregarDB" style="background:rgb(163,0,0); color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">+ Add</button>
       </div>
       <table style="width:100%; border-collapse:collapse;" id="tablaVisual">
         <thead><tr style="background:var(--gris-oscuro); color:white;"><th>Cód</th><th>Cant</th><th>Desc</th><th>Ub</th><th>Acción</th></tr></thead>
@@ -129,49 +118,35 @@
   <script>
     const URL_APLICACION_WEB = "https://script.google.com/macros/s/AKfycbwgX5Y0eKXWBx6mrUYAEl3RZyX5VrAHd_WloEENa7KSGzCP1EKDttrDBC3KPVU5mRDNIQ/exec";
 
-    // --- LÓGICA DE MEMORIA (LocalStorage) ---
     document.addEventListener('DOMContentLoaded', () => {
       const opGuardado = localStorage.getItem('app_operario');
       let celGuardada = localStorage.getItem('app_celda');
-      
-      // FIX de Memoria: Si la memoria guardó un texto viejo con guion, lo forzamos a actualizarse a paréntesis.
       if(celGuardada === "65 - KUKA KR5") celGuardada = "65 (KUKA KR5)";
       if(celGuardada === "97 - KUKA KR C4") celGuardada = "97 (KUKA KR C4)";
-
       if(opGuardado) document.getElementById('operario').value = opGuardado;
       if(celGuardada) document.getElementById('celda').value = celGuardada;
     });
 
-    function guardarPreferencia(clave, valor) {
-      localStorage.setItem('app_' + clave, valor);
-    }
+    function guardarPreferencia(clave, valor) { localStorage.setItem('app_' + clave, valor); }
 
-    // --- LÓGICA DE BOTONES ---
     document.getElementById('btnCrear').addEventListener('click', function() {
       const op = document.getElementById('operario').value;
       const cel = document.getElementById('celda').value;
       if(!op || !cel) { alert("⚠️ Por favor selecciona tu NOMBRE y la MÁQUINA antes de continuar."); return; }
-      
       window.location.href = `formulario.html?maquina=${encodeURIComponent(cel)}&operario=${encodeURIComponent(op)}`; 
     });
 
     document.getElementById('btnBuscar').addEventListener('click', async function() {
       const codigo = document.getElementById('buscarCodigo').value.trim();
       const resDiv = document.getElementById('resultadoBusqueda');
-      
       if(codigo === "") { alert("Ingresa un código."); return; }
-      
-      resDiv.innerHTML = "Buscando datos... ⏳";
-      resDiv.style.display = "block";
-
+      resDiv.innerHTML = "Buscando datos... ⏳"; resDiv.style.display = "block";
       try {
         const resp = await fetch(`${URL_APLICACION_WEB}?accion=buscar&codigo=${codigo}`);
         const json = await resp.json();
-        
         if(json.status === 'Exito') {
           const d = json.data;
           const maquinaInstructivo = d.maquina; 
-
           resDiv.innerHTML = `
             <p style="margin:0; font-size:14px;"><strong>Tubo:</strong> ${d.codigoTubo} - ${d.descTubo}</p>
             <p style="margin:5px 0; font-size:14px;"><strong>Rev:</strong> <span style="color:red; font-weight:bold;">${d.revision}</span> | <strong>Máquina:</strong> ${d.maquina}</p>
@@ -180,57 +155,26 @@
               <a href="vista_instructivo.html?codigo=${d.codigoTubo}" class="btn-res" style="background:#4b5563;">🖨️ Ver / Imprimir</a>
             </div>
           `;
-        } else {
-          resDiv.innerHTML = "❌ No se encontró el instructivo.";
-        }
-      } catch(e) {
-        resDiv.innerHTML = "⚠️ Error conectando con la base de datos.";
-      }
+        } else { resDiv.innerHTML = "❌ No se encontró el instructivo."; }
+      } catch(e) { resDiv.innerHTML = "⚠️ Error conectando con la base de datos."; }
     });
 
-    // --- NUEVA FUNCIÓN: VALIDACIÓN INTELIGENTE ---
     function intentarEditar(codigoTubo, maquinaInstructivo) {
       const opActual = document.getElementById('operario').value;
       const celActual = document.getElementById('celda').value;
-
-      if (!opActual || !celActual) {
-        alert("⚠️ ATENCIÓN:\n\nPara editar, primero debes seleccionar tu NOMBRE y la MÁQUINA en el menú de arriba.\n\nEsto es necesario para registrar quién hizo el cambio.");
-        document.getElementById('operario').focus();
-        return;
-      }
-
-      // EXTRAEMOS SOLO EL NÚMERO (65 o 97) PARA COMPARAR, ASÍ IGNORAMOS GUIONES Y PARÉNTESIS
+      if (!opActual || !celActual) { alert("⚠️ ATENCIÓN:\n\nPara editar, selecciona tu NOMBRE y la MÁQUINA arriba."); document.getElementById('operario').focus(); return; }
       const numCeldaActual = celActual.includes("97") ? "97" : (celActual.includes("65") ? "65" : "");
       const numMaquinaInst = maquinaInstructivo.includes("97") ? "97" : (maquinaInstructivo.includes("65") ? "65" : "");
-
-      if (numCeldaActual !== numMaquinaInst) {
-        alert(`⛔ ERROR DE MÁQUINA:\n\nEstás intentando editar un instructivo de la Máquina ${numMaquinaInst}, pero en el menú seleccionaste la Máquina ${numCeldaActual}.\n\nPor favor, cambia la selección de la máquina en el menú para evitar errores.`);
-        return;
-      }
-
+      if (numCeldaActual !== numMaquinaInst) { alert(`⛔ ERROR DE MÁQUINA:\n\nIntentas editar un instructivo de la Máquina ${numMaquinaInst}, pero seleccionaste la Máquina ${numCeldaActual}.`); return; }
       window.location.href = `formulario.html?accion=editar&codigo=${codigoTubo}&maquina=${encodeURIComponent(celActual)}&operario=${encodeURIComponent(opActual)}`;
     }
 
-    // --- LÓGICA IA Y GESTIÓN ---
-    const modalIA = document.getElementById('modalIA');
-    const inputIA = document.getElementById('inputIA');
-    const btnEnviarIA = document.getElementById('btnEnviarIA');
-    const chatIA = document.getElementById('chatIA');
-    const loaderIA = document.getElementById('loaderIA');
-
-    document.getElementById('btnAbrirIA').addEventListener('click', () => modalIA.style.display = 'flex');
-    document.getElementById('btnCerrarIA').addEventListener('click', () => modalIA.style.display = 'none');
-
+    const modalIA = document.getElementById('modalIA'); const inputIA = document.getElementById('inputIA'); const btnEnviarIA = document.getElementById('btnEnviarIA'); const chatIA = document.getElementById('chatIA'); const loaderIA = document.getElementById('loaderIA');
+    document.getElementById('btnAbrirIA').addEventListener('click', () => modalIA.style.display = 'flex'); document.getElementById('btnCerrarIA').addEventListener('click', () => modalIA.style.display = 'none');
     btnEnviarIA.addEventListener('click', async function() {
-      const consulta = inputIA.value.trim();
-      if(consulta === "") return;
+      const consulta = inputIA.value.trim(); if(consulta === "") return;
       chatIA.style.display = 'none'; loaderIA.style.display = 'block'; inputIA.disabled = true; this.disabled = true;
-      try {
-        const respuesta = await fetch(URL_APLICACION_WEB + "?accion=buscar_ia&query=" + encodeURIComponent(consulta));
-        const resultado = await respuesta.json();
-        loaderIA.style.display = 'none'; chatIA.style.display = 'block';
-        chatIA.innerHTML = resultado.status === 'Exito' ? resultado.respuesta : "❌ Hubo un error procesando tu consulta.";
-      } catch (error) { loaderIA.style.display = 'none'; chatIA.style.display = 'block'; chatIA.innerHTML = "⚠️ Error de red."; }
+      try { const respuesta = await fetch(URL_APLICACION_WEB + "?accion=buscar_ia&query=" + encodeURIComponent(consulta)); const resultado = await respuesta.json(); loaderIA.style.display = 'none'; chatIA.style.display = 'block'; chatIA.innerHTML = resultado.status === 'Exito' ? resultado.respuesta : "❌ Hubo un error procesando tu consulta."; } catch (error) { loaderIA.style.display = 'none'; chatIA.style.display = 'block'; chatIA.innerHTML = "⚠️ Error de red."; }
       inputIA.disabled = false; this.disabled = false; inputIA.value = "";
     });
 
