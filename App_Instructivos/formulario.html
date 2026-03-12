@@ -40,7 +40,6 @@
     .btn-guardar:hover { background-color: var(--rojo-oscuro); }
     .btn-guardar:disabled { background-color: var(--gris-oscuro); cursor: wait; }
 
-    /* Estilos para el contenedor de la foto */
     .foto-preview-container { position: relative; max-width: 600px; margin: 15px auto 0 auto; display: none; border: 2px dashed rgb(135,135,135); padding: 10px; border-radius: 4px; background-color: rgb(245,245,245); }
     .foto-preview-img { width: 100%; height: auto; border-radius: 4px; object-fit: contain; display: block; }
     .btn-eliminar-foto { position: absolute; top: 15px; right: 15px; background-color: var(--rojo-marca); color: white; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.4); }
@@ -54,7 +53,7 @@
       <div class="cabecera-titular">
         <a href="index.html" class="btn-volver-menu">← Menú Principal</a>
         <h1 id="tituloPrincipal">Instructivo Puesta a Punto - Celda Soldadura</h1>
-        <div style="width: 120px;"></div> <!-- Nivelador visual -->
+        <div style="width: 120px;"></div>
       </div>
       <div class="fila-grid-3">
         <div class="campo"><label>1. N° Máquina:</label><input type="text" id="campoMaquina" readonly value="Cargando..."></div>
@@ -156,7 +155,6 @@
   <script>
     const URL_APLICACION_WEB = "https://script.google.com/macros/s/AKfycbwgX5Y0eKXWBx6mrUYAEl3RZyX5VrAHd_WloEENa7KSGzCP1EKDttrDBC3KPVU5mRDNIQ/exec"; 
     
-    // --- LÓGICA DE DETECCIÓN DE MÁQUINA Y URL ---
     const urlParams = new URLSearchParams(window.location.search);
     const maquinaRaw = urlParams.get('maquina') || "";
     const idMaquina = maquinaRaw.includes("97") ? "97" : "65";
@@ -164,7 +162,6 @@
     let bdProductos = {}; let bdDispositivosArray = []; 
 
     document.addEventListener('DOMContentLoaded', async function() {
-      // 1. Sincronizar Máquina
       const inputMaquina = document.getElementById('campoMaquina');
       const tituloH1 = document.getElementById('tituloPrincipal');
       
@@ -185,7 +182,6 @@
       agregarFilaClampeo('cuerpo-clamp-e1'); 
       agregarFilaClampeo('cuerpo-clamp-e2');
 
-      // 2. Cargar datos si es Edición
       if (urlParams.get('accion') === 'editar') {
         await cargarDatosEdicion(urlParams.get('codigo'));
       }
@@ -200,7 +196,6 @@
       evento.currentTarget.classList.add("activo");
     }
 
-    // Funciones de Agregar / Eliminar Filas
     function agregarFilaDispositivo(idTablaCuerpo) {
       const tbody = document.getElementById(idTablaCuerpo);
       if (tbody.children.length >= 20) return;
@@ -230,10 +225,9 @@
       }
     }
 
-    // Funciones Fotográficas y Variables Originales
     let fotoComprimidaE1 = null; 
     let fotoComprimidaE2 = null;
-    let fotoOriginalE1 = ""; // <-- NUEVO: Para no perder la foto al editar
+    let fotoOriginalE1 = ""; 
     let fotoOriginalE2 = ""; 
 
     function procesarFoto(event, estacion) {
@@ -269,12 +263,12 @@
       if(estacion === 'E2') { fotoComprimidaE2 = null; fotoOriginalE2 = ""; }
     }
 
-    // --- CONEXIÓN WEB ---
     async function cargarBaseDeDatos() {
       try {
         const respuesta = await fetch(URL_APLICACION_WEB);
         const paqueteMaestro = await respuesta.json(); 
-        bdProductos = paqueteMaestro.productos || {}; bdDispositivosArray = paqueteMaestro.dispositivosArray || []; 
+        bdProductos = paqueteMaestro.productos || {}; 
+        bdDispositivosArray = paqueteMaestro.dispositivosArray || []; 
         document.getElementById('descTubo').placeholder = "Esperando código...";
         document.getElementById('descVastago').placeholder = "Esperando código...";
       } catch (error) { console.error("Error conectando:", error); }
@@ -296,9 +290,7 @@
         fila.querySelector('.desc-dispositivo').value = ""; 
         fila.querySelector('.ub-dispositivo').value = ""; 
       } else {
-        // Buscamos en el array filtrando por código y por máquina a la vez
         const dispositivo = bdDispositivosArray.find(d => d.codigo.toString() === codigo && d.maquina === maquinaActual);
-        
         if (dispositivo) { 
           fila.querySelector('.desc-dispositivo').value = dispositivo.desc; 
           fila.querySelector('.ub-dispositivo').value = dispositivo.ub; 
@@ -309,7 +301,6 @@
       }
     }
 
-    // --- LÓGICA DE EDICIÓN MEJORADA ---
     async function cargarDatosEdicion(codigo) {
       const btn = document.getElementById('btnGuardar');
       btn.innerText = "💾 Guardar Nueva Revisión";
@@ -321,14 +312,11 @@
         if (j.status === 'Exito') {
           const d = j.data;
           
-          // Tubo y Vástago (Asignamos Directo para evitar "No encontrado")
           document.getElementById('codigoTubo').value = d.codigoTubo;
           document.getElementById('descTubo').value = d.descTubo || ""; 
-          
           document.getElementById('codigoVastago').value = d.codigoVastago;
           document.getElementById('descVastago').value = d.descVastago || ""; 
           
-          // Incrementar Revisión
           let revActual = parseInt(d.revision.replace("Rev. ", "")) || 0;
           let nuevaRev = revActual + 1;
           const campoRevision = document.getElementById('campoRevision');
@@ -343,10 +331,9 @@
           fotoOriginalE1 = d.fotoE1 || "";
           fotoOriginalE2 = d.fotoE2 || "";
 
-          // --- FIX FOTOS: Endpoint 'thumbnail' para saltar restricciones ---
           function obtenerUrlDirecta(urlDrive) {
             if (!urlDrive) return "";
-            var match = urlDrive.match(/[-\w]{25,}/); // Atrapa el ID de Drive
+            var match = urlDrive.match(/[-\w]{25,}/);
             return match ? "https://drive.google.com/thumbnail?id=" + match[0] + "&sz=w1000" : urlDrive;
           }
 
@@ -361,7 +348,6 @@
             document.getElementById('inputFotoE2').style.display = 'none';
           }
 
-          // Cargar Tablas
           cargarTablaDispositivos('cuerpo-disp-e1', d.dispE1);
           cargarTablaDispositivos('cuerpo-disp-e2', d.dispE2);
           cargarTablaClampeo('cuerpo-clamp-e1', d.clampE1);
@@ -370,12 +356,10 @@
       } catch(e) { console.error("Error cargando edición:", e); }
     }
 
-    // Funciones para Reconstruir las Tablas
     function cargarTablaDispositivos(idTbody, datos) {
       const tbody = document.getElementById(idTbody);
       tbody.innerHTML = ''; 
       if (!datos || datos.length === 0) { agregarFilaDispositivo(idTbody); return; } 
-      
       datos.forEach(filaData => {
         const nuevaFila = document.createElement('tr');
         nuevaFila.innerHTML = `<td><input type="number" value="${filaData[0] || ''}"></td><td><input type="number" oninput="buscarDispositivo(this)" value="${filaData[1] || ''}"></td><td><input type="text" class="ub-dispositivo" readonly value="${filaData[2] || ''}"></td><td><input type="text" class="desc-dispositivo" readonly value="${filaData[3] || ''}"></td><td><input type="text" value="${filaData[4] || ''}"></td><td style="text-align:center;"><button type="button" class="btn-eliminar-fila" onclick="eliminarFila(this)">X</button></td>`;
@@ -387,7 +371,6 @@
       const tbody = document.getElementById(idTbody);
       tbody.innerHTML = ''; 
       if (!datos || datos.length === 0) { agregarFilaClampeo(idTbody); return; } 
-      
       datos.forEach(filaData => {
         const nuevaFila = document.createElement('tr');
         let selectAccion = opcionesAccion.replace(`value="${filaData[1]}"`, `value="${filaData[1]}" selected`);
@@ -397,7 +380,6 @@
       });
     }
 
-    // --- GUARDADO ---
     function extraerDatosTabla(idTbody) {
       const filas = document.querySelectorAll('#' + idTbody + ' tr');
       const datos = [];
@@ -409,6 +391,7 @@
       return datos;
     }
 
+    // --- ESCUDO ANTIBLOQUEOS (Botón de Guardado) ---
     const btnGuardar = document.getElementById('btnGuardar');
     const campoRevision = document.getElementById('campoRevision');
 
@@ -423,34 +406,35 @@
       this.disabled = true;
       this.textContent = "Guardando en la nube... ⏳";
 
-      const paqueteFinal = {
-        accion: 'guardar_instructivo',
-        operario: document.getElementById('operario').value,
-        fecha: document.getElementById('fechaActual').value,
-        maquina: document.getElementById('campoMaquina').value,
-        revision: campoRevision.value,
-        codigoTubo: codTubo,
-        descTubo: document.getElementById('descTubo').value,
-        codigoVastago: document.getElementById('codigoVastago').value,
-        descVastago: document.getElementById('descVastago').value,
-        
-        // FOTOS: Enviamos la nueva (si hay) y la vieja por si no subió nada
-        progE1: document.getElementById('progE1').value,
-        obsE1: document.getElementById('obsE1').value,
-        fotoE1: fotoComprimidaE1,       
-        urlViejaE1: fotoOriginalE1,     
-        dispE1: extraerDatosTabla('cuerpo-disp-e1'),
-        clampE1: extraerDatosTabla('cuerpo-clamp-e1'),
-        
-        progE2: document.getElementById('progE2').value,
-        obsE2: document.getElementById('obsE2').value,
-        fotoE2: fotoComprimidaE2,
-        urlViejaE2: fotoOriginalE2,
-        dispE2: extraerDatosTabla('cuerpo-disp-e2'),
-        clampE2: extraerDatosTabla('cuerpo-clamp-e2')
-      };
-
       try {
+        // Envolvemos todo el armado de datos en el try. 
+        // Si falta algo, lanzará el catch en lugar de congelar la pantalla.
+        const paqueteFinal = {
+          accion: 'guardar_instructivo',
+          operario: urlParams.get('operario') || "No registrado",
+          fecha: document.getElementById('fechaActual').value,
+          maquina: document.getElementById('campoMaquina').value,
+          revision: campoRevision.value,
+          codigoTubo: codTubo,
+          descTubo: document.getElementById('descTubo').value,
+          codigoVastago: document.getElementById('codigoVastago').value,
+          descVastago: document.getElementById('descVastago').value,
+          
+          progE1: document.getElementById('progE1').value,
+          obsE1: document.getElementById('obsE1').value,
+          fotoE1: fotoComprimidaE1,       
+          urlViejaE1: fotoOriginalE1,     
+          dispE1: extraerDatosTabla('cuerpo-disp-e1'),
+          clampE1: extraerDatosTabla('cuerpo-clamp-e1'),
+          
+          progE2: document.getElementById('progE2').value,
+          obsE2: document.getElementById('obsE2').value,
+          fotoE2: fotoComprimidaE2,
+          urlViejaE2: fotoOriginalE2,
+          dispE2: extraerDatosTabla('cuerpo-disp-e2'),
+          clampE2: extraerDatosTabla('cuerpo-clamp-e2')
+        };
+
         await fetch(URL_APLICACION_WEB, {
           method: 'POST',
           mode: 'no-cors',
@@ -461,11 +445,12 @@
         alert("✅ ¡Instructivo guardado exitosamente!");
         window.location.href = "index.html"; 
 
-      } catch(e) {
-        alert("❌ Error de conexión al guardar.");
+      } catch(error) {
+        console.error("Error detectado: ", error);
+        alert("❌ Ocurrió un error interno antes de enviar: " + error.message);
+        this.disabled = false;
+        this.textContent = "Guardar Instructivo Completado";
       }
-      this.disabled = false;
-      this.textContent = "Guardar Instructivo Completado";
     });
   </script>
 </body>
