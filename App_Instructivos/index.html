@@ -147,12 +147,21 @@
         if(json.status === 'Exito') {
           const d = json.data;
           const maquinaInstructivo = d.maquina; 
+          
+          // --- NUEVO: Mostrar Tubo y Vástago dinámicamente ---
+          let infoPiezas = "";
+          if (d.codigoTubo) infoPiezas += `<strong>Tubo:</strong> ${d.codigoTubo} - ${d.descTubo || ''}<br>`;
+          if (d.codigoVastago) infoPiezas += `<strong>Vástago:</strong> ${d.codigoVastago} - ${d.descVastago || ''}`;
+          
+          // Usamos el código que exista (Tubo o Vástago) para abrir el link sin errores
+          const codigoParaUrl = d.codigoTubo || d.codigoVastago;
+
           resDiv.innerHTML = `
-            <p style="margin:0; font-size:14px;"><strong>Tubo:</strong> ${d.codigoTubo} - ${d.descTubo}</p>
+            <p style="margin:0; font-size:14px; line-height: 1.4;">${infoPiezas}</p>
             <p style="margin:5px 0; font-size:14px;"><strong>Rev:</strong> <span style="color:red; font-weight:bold;">${d.revision}</span> | <strong>Máquina:</strong> ${d.maquina}</p>
             <div class="botones-resultado">
-              <button onclick="intentarEditar('${d.codigoTubo}', '${maquinaInstructivo}')" class="btn-res" style="background:#2563eb;">✏️ Editar</button>
-              <a href="vista_instructivo.html?codigo=${d.codigoTubo}" class="btn-res" style="background:#4b5563;">🖨️ Ver / Imprimir</a>
+              <button onclick="intentarEditar('${codigoParaUrl}', '${maquinaInstructivo}')" class="btn-res" style="background:#2563eb;">✏️ Editar</button>
+              <a href="vista_instructivo.html?codigo=${codigoParaUrl}" class="btn-res" style="background:#4b5563;">🖨️ Ver / Imprimir</a>
             </div>
           `;
         } else { resDiv.innerHTML = "❌ No se encontró el instructivo."; }
